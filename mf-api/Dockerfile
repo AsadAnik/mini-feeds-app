@@ -3,45 +3,39 @@ FROM node:22 AS build
 
 WORKDIR /app
 
-# Install dependencies (all, including dev)
-COPY package*.json ./
+# Explicitly copy package files first
+COPY package.json package-lock.json ./
+
+# Install all dependencies
 RUN npm install
 
-# Copy source code and config
+# Copy everything from the current folder
 COPY . .
 
-# Generate Prisma client
+# Generate Prisma client & Build
 RUN npx prisma generate
-
-# Build the application (TypeScript to JavaScript)
 RUN npm run build
 
-# Prune development dependencies to keep the image small
+# Prune dev dependencies
 RUN npm prune --production
 
 # Final Production stage
 FROM node:22-slim
 
-# Set to production
 ENV NODE_ENV=production
-
 WORKDIR /app
 
-# Install openssl (required for Prisma's database engine)
+# Install openssl (Required for Prisma)
 RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
-# Copy necessary files from the build stage
-# This is much safer than copying from the host context again
+# Copy from build stage
 COPY --from=build /app/package.json ./
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
 COPY --from=build /app/prisma.config.js ./prisma.config.js
 
-# Expose the port (Render will use this)
 EXPOSE 3000
 
-# Start command:
-# 1. Sync the database schema (prisma db push)
-# 2. Start the compiled JavaScript server
+# Push schema and start
 CMD ["sh", "-c", "npx prisma db push --accept-data-loss && node dist/server.js"]
