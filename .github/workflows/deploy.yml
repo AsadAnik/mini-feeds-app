@@ -34,7 +34,6 @@ jobs:
         working-directory: ./mf-api
 
       - name: Generate Prisma Client
-        # Now uses your real database secret!
         run: npx prisma generate
         working-directory: ./mf-api
         env:
