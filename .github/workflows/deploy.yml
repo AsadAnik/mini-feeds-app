@@ -34,17 +34,16 @@ jobs:
         working-directory: ./mf-api
 
       - name: Generate Prisma Client
-        # We provide a dummy DATABASE_URL for Prisma 7 build check
         run: npx prisma generate
         working-directory: ./mf-api
         env:
-          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Build TypeScript
         run: npm run build
         working-directory: ./mf-api
         env:
-          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
   deploy:
     name: Trigger Render Deployment
