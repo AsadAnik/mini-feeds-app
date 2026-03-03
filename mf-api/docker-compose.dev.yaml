@@ -1,0 +1,48 @@
+version: "3.8"
+
+services:
+  # region Development App
+  app:
+    container_name: mini-feeds-api
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./src:/app/src
+      - ./prisma:/app/prisma
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - APP_NAME=Mini Feeds API
+      - HOST=0.0.0.0
+      - PORT=3000
+      - JWT_SECRET=supersecret
+      - DATABASE_URL=postgresql://root:rootpassword@db:5432/mini-feeds-db?schema=public
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  # region Database
+  db:
+    image: postgres:15
+    container_name: postgres-container
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: rootpassword
+      POSTGRES_DB: mini-feeds-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+volumes:
+  db-data:
+
+networks:
+  app-network:
+    driver: bridge

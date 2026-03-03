@@ -1,0 +1,23 @@
+FROM node:23-slim
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install
+
+# Copy Prisma Before Generating
+COPY prisma ./prisma
+
+# Generate Prisma Client
+RUN npx prisma generate
+
+# Doing Migration
+RUN npm run generate
+RUN npm run migrate
+
+COPY . .
+
+EXPOSE 3000
+
+CMD ["npm", "run", "dev"]

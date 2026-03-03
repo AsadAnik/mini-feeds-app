@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  # region Production App
+  app:
+    container_name: mini-feeds-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/app/src
+      - ./node_modules:/app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - APP_NAME=Mini Feeds API
+      - HOST=0.0.0.0
+      - PORT=3000
+      - JWT_SECRET=supersecret
+      - DATABASE_URL=mysql://root:rootpassword@db:3306/mini-feeds-db
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  # region Database
+  db:
+    image: mysql:8.0
+    container_name: mysql-container
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mini-feeds-db
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - app-network
+
+volumes:
+  db-data:
+
+networks:
+  app-network:
+    driver: bridge
