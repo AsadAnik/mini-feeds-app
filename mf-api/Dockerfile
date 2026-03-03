@@ -4,7 +4,7 @@ FROM node:22 AS build
 WORKDIR /app
 
 # Explicitly copy package files first
-COPY package.json package-lock.json ./
+COPY package*.json ./
 
 # Install all dependencies
 RUN npm install
