@@ -15,7 +15,10 @@ class AuthMiddleware {
     static verifyUser = async (req: Request | any, res: Response | any, next: NextFunction) => {
         const token = req.headers['authorization']?.split(' ')[1];
         if (!token) {
-            return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Unauthorized: Access token required' });
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                success: false,
+                message: 'Unauthorized: Access token required'
+            });
         }
 
         try {
@@ -28,7 +31,10 @@ class AuthMiddleware {
             const userService = new UserService();
             const user = await userService.findUser(decoded.id);
             if (!user) {
-                return res.status(StatusCodes.UNAUTHORIZED).json({ success: false, message: 'User not found' });
+                return res.status(StatusCodes.UNAUTHORIZED).json({
+                    success: false,
+                    message: 'User not found'
+                });
             }
 
             // Attach user to the request object
@@ -37,7 +43,10 @@ class AuthMiddleware {
 
         } catch (err) {
             console.error('Token verification error:', err);
-            return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Invalid or expired access token' });
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                success: false,
+                message: 'Invalid or expired access token'
+            });
         }
     };
 }

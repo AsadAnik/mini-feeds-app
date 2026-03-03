@@ -1,6 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { authRoutes } from '../routes';
-// import { AuthMiddleware } from '../middlewares';
+import { authRoutes, postRoutes, userRoutes } from '../routes';
 
 const router: Router = Router();
 
@@ -9,6 +8,8 @@ const router: Router = Router();
  * All required routes root
  */
 router.use('/api/v1/auth', authRoutes);
+router.use('/api/v1/posts', postRoutes);
+router.use('/api/v1/users', userRoutes);
 
 /**
  * ---- Health Check for the application here ----

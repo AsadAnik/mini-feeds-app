@@ -76,6 +76,34 @@ The server will be running at `http://localhost:3000`.
 
 ---
 
+## 📖 API Documentation
+
+This project uses **Swagger** for API documentation. Once the server is running, you can access the interactive Swagger UI to explore and test all available endpoints.
+
+### 🔗 Accessing Swagger UI
+Visit the following URL in your browser:
+**[http://localhost:3000/api-docs](http://localhost:3000/api-docs)**
+
+### 🛠️ Available Endpoints Summary
+
+#### **Auth**
+- `POST /auth/register` - Register a new user.
+- `POST /auth/login` - Login and get JWT token.
+- `GET /auth/logout` - Logout user.
+
+#### **Users**
+- `GET /users/profile` - Get current user profile (Requires JWT).
+
+#### **Posts**
+- `POST /posts` - Create a new post (Requires JWT).
+- `GET /posts` - Get paginated posts.
+- `POST /posts/{id}/like` - Toggle like on a post (Requires JWT).
+- `POST /posts/{id}/comment` - Add a comment to a post (Requires JWT).
+- `DELETE /posts/{id}` - Delete your post (Requires JWT).
+- `DELETE /posts/comments/{commentId}` - Delete your comment (Requires JWT).
+
+---
+
 ## 📜 Available Scripts
 
 | Command | Description |
@@ -91,7 +119,7 @@ The server will be running at `http://localhost:3000`.
 
 ## 🔒 Security
 - **Authentication**: JWT based.
-- **Encryption**: Passwords hashed using `bcrypt`.
+- **Encryption**: Passwords hashed using `bcryptjs`.
 - **Validation**: Schema validation for incoming requests.
 
 ---

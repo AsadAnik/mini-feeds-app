@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 class BcryptLib {
     private readonly saltRounds: number = Number(process.env.SALT_ROUNDS) ?? 10;

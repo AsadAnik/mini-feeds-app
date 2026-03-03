@@ -2,6 +2,8 @@ import PrismaClient from '../prisma';
 import { IRegisterUser, ILoginUser } from '../types/user.types';
 import { BcryptLib } from '../lib/shared';
 import { TokenLib } from '../lib/shared';
+import { ApiError } from '../utils/errors/ApiError';
+import { StatusCodes } from 'http-status-codes';
 
 class AuthService {
     private readonly bcryptLib: BcryptLib;
@@ -21,11 +23,15 @@ class AuthService {
     public async loginUser(userInfo: ILoginUser): Promise<any> {
         try {
             const user = await PrismaClient.user.findUnique({ where: { email: userInfo.email } });
-            if (!user) throw new Error(`User not found for email: ${userInfo.email}`);
+            if (!user) {
+                throw new ApiError(StatusCodes.NOT_FOUND, `User not found for email: ${userInfo.email}`);
+            }
 
             // Compare Password
             const comparedPassword = await this.bcryptLib.comparePassword(userInfo.password, user.password);
-            if (!comparedPassword) throw new Error(`Invalid password for email: ${userInfo.email}`);
+            if (!comparedPassword) {
+                throw new ApiError(StatusCodes.UNAUTHORIZED, `Invalid password for account: ${userInfo.email}`);
+            }
 
             // Generate Access Token
             const accessToken: string = this.tokenLib.generateToken({ id: user.id, email: user.email }, '1d');

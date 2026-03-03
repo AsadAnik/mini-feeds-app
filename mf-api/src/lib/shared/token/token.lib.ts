@@ -9,7 +9,7 @@ class TokenLib {
      * @param {string} [time='15m'] - Optional. The expiration time for the token. Defaults to '15m' (15 minutes). Can be specified in string formats like '1h', '2d', etc.
      * @returns {string} The generated JWT as a string.
      */
-    public generateToken = (payload: any, time: string = '15m') => {
+    public generateToken = (payload: any, time: string = '30m') => {
         // @ts-ignore
         return jwt.sign(payload, this.jwtSecret, {
             expiresIn: time

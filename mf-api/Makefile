@@ -1,4 +1,4 @@
-# Makefile for Node.js Application with Docker and MySQL
+# Makefile for Node.js Application with Docker and PostgreSQL
 
 # VARIABLES
 DOCKER_COMPOSE = docker-compose
@@ -14,9 +14,9 @@ dev-build:
 	docker build -f Dockerfile.dev -t $(DOCKER_IMAGE_NAME):dev .
 
 .PHONY: dev-up
-dev-up: dev-build
+dev-up:
 	@echo "Starting development environment..."
-	$(DOCKER_COMPOSE_DEV) up -d
+	$(DOCKER_COMPOSE_DEV) up --build
 
 .PHONY: dev-down
 dev-down:
@@ -33,10 +33,9 @@ prod-build:
 	@echo "Building production Docker image..."
 	docker build -f Dockerfile -t $(DOCKER_IMAGE_NAME):prod .
 
-.PHONY: prod-up
-prod-up: prod-build
+prod-up:
 	@echo "Starting production environment..."
-	$(DOCKER_COMPOSE_PROD) up -d
+	$(DOCKER_COMPOSE_PROD) up --build
 
 .PHONY: prod-down
 prod-down:

@@ -7,18 +7,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    volumes:
-      - ./src:/app/src
-      - ./node_modules:/app/node_modules
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - APP_NAME=Mini Feeds API
       - HOST=0.0.0.0
       - PORT=3000
       - JWT_SECRET=supersecret
-      - DATABASE_URL=mysql://root:rootpassword@db:3306/mini-feeds-db
+      - DATABASE_URL=postgresql://root:rootpassword@db:5432/mini-feeds-db?schema=public
     depends_on:
       - db
     networks:
@@ -26,16 +23,17 @@ services:
 
   # region Database
   db:
-    image: mysql:8.0
-    container_name: mysql-container
+    image: postgres:15-alpine
+    container_name: postgres-container
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: mini-feeds-db
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: rootpassword
+      POSTGRES_DB: mini-feeds-db
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - db-data:/var/lib/mysql
+      - db-data:/var/lib/postgresql/data
     networks:
       - app-network
 
