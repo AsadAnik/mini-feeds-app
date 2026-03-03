@@ -10,11 +10,12 @@ on:
   pull_request:
     branches:
       - deploy
+      - main
     paths:
       - "mf-api/**"
 
 jobs:
-  build-and-test:
+  build-check:
     name: Build Check
     runs-on: ubuntu-latest
 
@@ -32,13 +33,22 @@ jobs:
         run: npm install
         working-directory: ./mf-api
 
-      - name: Build
+      - name: Generate Prisma Client
+        # We provide a dummy DATABASE_URL for Prisma 7 build check
+        run: npx prisma generate
+        working-directory: ./mf-api
+        env:
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+
+      - name: Build TypeScript
         run: npm run build
         working-directory: ./mf-api
+        env:
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
 
   deploy:
     name: Trigger Render Deployment
-    needs: build-and-test
+    needs: build-check
     if: github.event_name == 'push' && github.ref == 'refs/heads/deploy'
     runs-on: ubuntu-latest
     steps:
