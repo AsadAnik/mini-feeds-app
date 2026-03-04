@@ -39,6 +39,8 @@ class AuthService {
             return {
                 id: user.id,
                 email: user.email,
+                fullName: user.fullName,
+                username: user.username,
                 accessToken,
             };
 
@@ -60,10 +62,19 @@ class AuthService {
             userInfo.password = await this.bcryptLib.hashPassword(userInfo.password);
 
             // Create User DB
-            const createUser = await PrismaClient.user.create({ data: userInfo });
-            if (!createUser) throw new Error(`Error while creating user : ${createUser}`);
+            const createUser = await PrismaClient.user.create({
+                data: userInfo,
+                select: {
+                    id: true,
+                    email: true,
+                    fullName: true,
+                    username: true,
+                    createdAt: true
+                }
+            });
+            if (!createUser) throw new Error(`Error while creating user`);
 
-            return { email: userInfo.email };
+            return createUser;
 
         } catch (error) {
             console.error(`Error occcured while register user: ${error}`);

@@ -22,9 +22,15 @@ const authController = new AuthController();
  *             type: object
  *             required:
  *               - email
+ *               - fullName
+ *               - username
  *               - password
  *             properties:
  *               email:
+ *                 type: string
+ *               fullName:
+ *                 type: string
+ *               username:
  *                 type: string
  *               password:
  *                 type: string

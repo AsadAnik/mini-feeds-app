@@ -9,6 +9,8 @@
  */
 export interface IRegisterUser {
     email: string;
+    fullName: string;
+    username: string;
     password: string;
 }
 

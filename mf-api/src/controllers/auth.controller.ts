@@ -17,8 +17,8 @@ class AuthController {
      */
     public register = async (req: Request, res: Response, _next: NextFunction) => {
         try {
-            const { email, password } = req.body;
-            const createUser = await this.authService.register({ email, password });
+            const { email, fullName, username, password } = req.body;
+            const createUser = await this.authService.register({ email, fullName, username, password });
             if (!createUser) throw new Error(`Can not create User`);
 
             res.status(200).json({
