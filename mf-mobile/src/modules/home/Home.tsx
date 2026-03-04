@@ -1,101 +1,119 @@
-import React, { useMemo } from 'react';
-import { View, StyleSheet, FlatList, RefreshControl, SafeAreaView, Platform, Text } from 'react-native';
+import React from 'react';
+import {
+    View,
+    StyleSheet,
+    FlatList,
+    RefreshControl,
+    SafeAreaView,
+    Platform,
+    Text,
+    ActivityIndicator,
+} from 'react-native';
 import { PostCard } from './components/PostCard';
-import { useFeedStore } from '../../store/useFeedStore';
 import { Input } from '../../components/Input';
 import { Search } from 'lucide-react-native';
+import { useHome } from './hooks/useHome';
+import { PostSkeleton } from './components/PostSkeleton';
+import { useThemeStore } from '@/store/useThemeStore';
+import { Colors } from '@/constants/Colors';
 
+// region HOME
 export function Home() {
-    const { posts, searchQuery, setSearchQuery } = useFeedStore();
+    const { theme } = useThemeStore();
+    const colors = Colors[theme];
+    const {
+        filteredPosts,
+        searchQuery,
+        setSearchQuery,
+        isLoadingPosts,
+        isFetchingMore,
+        refreshing,
+        onRefresh,
+        handleEndReached,
+    } = useHome();
 
-    const [refreshing, setRefreshing] = React.useState(false);
-    const onRefresh = React.useCallback(() => {
-        setRefreshing(true);
-        setTimeout(() => {
-            setRefreshing(false);
-        }, 1000);
-    }, []);
-
-    const filteredPosts = useMemo(() => {
-        if (!searchQuery) return posts;
-        return posts.filter(post =>
-            post.author.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            post.author.fullName.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-    }, [posts, searchQuery]);
-
+    // region Main UI
     return (
-        <SafeAreaView style={styles.safeArea}>
-            <View style={styles.container}>
-                <View style={styles.header}>
-                    <Text style={styles.headerTitle}>Feeds</Text>
+        <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+            <View style={[styles.container, { backgroundColor: colors.surface }]}>
+                {/* Header */}
+                <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
+                    <Text style={[styles.headerTitle, { color: colors.text }]}>Feeds</Text>
                     <Input
                         placeholder="Search by username..."
+                        placeholderTextColor={colors.textSecondary}
                         value={searchQuery}
                         onChangeText={setSearchQuery}
-                        leftIcon={<Search size={20} color="#9CA3AF" />}
-                        style={styles.searchInput}
+                        leftIcon={<Search size={18} color={colors.textSecondary} />}
+                        containerStyle={styles.searchInputContainer}
+                        style={{ color: colors.text, backgroundColor: colors.inputBackground }}
                     />
                 </View>
 
-                <FlatList
-                    data={filteredPosts}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => <PostCard post={item} />}
-                    refreshControl={
-                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#4F46E5']} />
-                    }
-                    contentContainerStyle={styles.listContent}
-                    showsVerticalScrollIndicator={false}
-                    ListEmptyComponent={
-                        <View style={styles.emptyBox}>
-                            <Text style={styles.emptyText}>No posts found by that username!</Text>
-                        </View>
-                    }
-                />
+                {isLoadingPosts && filteredPosts.length === 0 ? (
+                    <View style={{ backgroundColor: colors.surface }}>
+                        {[1, 2, 3, 4, 5].map((key) => (
+                            <PostSkeleton key={key} />
+                        ))}
+                    </View>
+                ) : (
+                    <FlatList
+                        data={filteredPosts}
+                        keyExtractor={(item) => item.id}
+                        renderItem={({ item }) => <PostCard post={item} />}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={refreshing}
+                                onRefresh={onRefresh}
+                                tintColor={colors.primary}
+                                colors={[colors.primary]}
+                            />
+                        }
+                        onEndReached={handleEndReached}
+                        onEndReachedThreshold={0.4}
+                        contentContainerStyle={styles.listContent}
+                        showsVerticalScrollIndicator={false}
+                        ListEmptyComponent={
+                            <View style={styles.emptyBox}>
+                                <Text style={styles.emptyIcon}>📭</Text>
+                                <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+                                    {searchQuery ? 'No users found matching that search.' : 'No posts yet.'}
+                                </Text>
+                            </View>
+                        }
+                        ListFooterComponent={
+                            isFetchingMore ? (
+                                <View style={styles.footerLoader}>
+                                    <PostSkeleton />
+                                </View>
+                            ) : null
+                        }
+                    />
+                )}
             </View>
         </SafeAreaView>
     );
 }
 
+// region STYLES-SHEET
 const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        backgroundColor: '#FFFFFF',
-        paddingTop: Platform.OS === 'android' ? 30 : 0
-    },
-    container: {
-        flex: 1,
-        backgroundColor: '#F9FAFB',
-    },
+    safeArea: { flex: 1, backgroundColor: '#FFFFFF', paddingTop: Platform.OS === 'android' ? 30 : 0 },
+    container: { flex: 1, backgroundColor: '#F9FAFB' },
     header: {
         backgroundColor: '#FFFFFF',
         paddingHorizontal: 20,
         paddingTop: 10,
-        paddingBottom: 16,
+        paddingBottom: 12,
         borderBottomWidth: 1,
         borderBottomColor: '#F3F4F6',
     },
-    headerTitle: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        marginBottom: 12,
-        color: '#111827',
-    },
-    searchInput: {
-        backgroundColor: '#F3F4F6',
-        borderWidth: 0,
-        minHeight: 44,
-    },
-    listContent: {
-        paddingBottom: 100, // accommodate bottom tab
-    },
-    emptyBox: {
-        padding: 40,
-        alignItems: 'center',
-    },
-    emptyText: {
-        color: '#6B7280',
-        fontSize: 16,
-    }
+    headerTitle: { fontSize: 28, fontWeight: 'bold', marginBottom: 10, color: '#111827' },
+    searchInputContainer: { marginBottom: 0 },
+    loadingBox: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 12 },
+    loadingText: { color: '#9CA3AF', fontSize: 15 },
+    listContent: { paddingBottom: 100 },
+    emptyBox: { paddingTop: 80, alignItems: 'center', gap: 10 },
+    emptyIcon: { fontSize: 40 },
+    emptyText: { color: '#9CA3AF', fontSize: 16 },
+    footerLoader: { paddingVertical: 20, alignItems: 'center' },
 });

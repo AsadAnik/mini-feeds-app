@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
     View,
     Text,
@@ -7,49 +7,51 @@ import {
     Platform,
     TouchableOpacity,
     SafeAreaView,
-    ScrollView
+    ScrollView,
+    Alert,
 } from 'react-native';
 import { Mail, Lock, User } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { Button } from '../../../components/Button';
 import { Input } from '../../../components/Input';
-import { useAuthStore } from '../../../store/useAuthStore';
+import { useRegister } from './hooks/useRegister';
+import { useThemeStore } from '@/store/useThemeStore';
+import { Colors } from '@/constants/Colors';
 
+// region REGISTER
 export function Register() {
-    const [username, setUsername] = useState('');
-    const [fullName, setFullName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-
     const router = useRouter();
-    const { login } = useAuthStore();
+    const { theme } = useThemeStore();
+    const colors = Colors[theme];
+    const {
+        fullName, setFullName,
+        username, setUsername,
+        email, setEmail,
+        password, setPassword,
+        isLoading,
+        error,
+        handleRegister,
+    } = useRegister();
 
-    const handleRegister = () => {
-        setIsLoading(true);
-        // Simulate API call
-        setTimeout(() => {
-            login({
-                id: '2',
-                username: username || 'newuser',
-                fullName: fullName || 'New User',
-                avatarUrl: 'https://i.pravatar.cc/150?u=a042581f4e29026704d'
-            });
-            setIsLoading(false);
-            router.replace('/(tabs)');
-        }, 1500);
-    };
+    React.useEffect(() => {
+        if (error) Alert.alert('Registration Failed', error);
+    }, [error]);
 
+    // region Main UI
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
             <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
                 style={{ flex: 1 }}
             >
-                <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+                <ScrollView
+                    contentContainerStyle={[styles.container, { backgroundColor: colors.background }]}
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                >
                     <View style={styles.header}>
-                        <Text style={styles.title}>Create Account</Text>
-                        <Text style={styles.subtitle}>Join MiniFeeds to connect with friends</Text>
+                        <Text style={[styles.title, { color: colors.text }]}>Create Account</Text>
+                        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Join MiniFeeds to connect with friends</Text>
                     </View>
 
                     <View style={styles.form}>
@@ -58,7 +60,7 @@ export function Register() {
                             placeholder="John Doe"
                             value={fullName}
                             onChangeText={setFullName}
-                            leftIcon={<User size={20} color="#6B7280" />}
+                            leftIcon={<User size={20} color={colors.textSecondary} />}
                         />
                         <Input
                             label="Username"
@@ -66,7 +68,7 @@ export function Register() {
                             autoCapitalize="none"
                             value={username}
                             onChangeText={setUsername}
-                            leftIcon={<User size={20} color="#6B7280" />}
+                            leftIcon={<User size={20} color={colors.textSecondary} />}
                         />
                         <Input
                             label="Email"
@@ -75,7 +77,7 @@ export function Register() {
                             autoCapitalize="none"
                             value={email}
                             onChangeText={setEmail}
-                            leftIcon={<Mail size={20} color="#6B7280" />}
+                            leftIcon={<Mail size={20} color={colors.textSecondary} />}
                         />
                         <Input
                             label="Password"
@@ -83,7 +85,7 @@ export function Register() {
                             secureTextEntry
                             value={password}
                             onChangeText={setPassword}
-                            leftIcon={<Lock size={20} color="#6B7280" />}
+                            leftIcon={<Lock size={20} color={colors.textSecondary} />}
                         />
 
                         <Button
@@ -95,9 +97,9 @@ export function Register() {
                     </View>
 
                     <View style={styles.footer}>
-                        <Text style={styles.footerText}>Already have an account? </Text>
+                        <Text style={[styles.footerText, { color: colors.textSecondary }]}>Already have an account? </Text>
                         <TouchableOpacity onPress={() => router.push('/login')}>
-                            <Text style={styles.loginText}>Sign In</Text>
+                            <Text style={[styles.loginText, { color: colors.primary }]}>Sign In</Text>
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
@@ -106,50 +108,16 @@ export function Register() {
     );
 }
 
+// region STYLES-SHEET
 const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        backgroundColor: '#FFFFFF',
-    },
-    container: {
-        paddingHorizontal: 24,
-        paddingVertical: 40,
-        justifyContent: 'center',
-        minHeight: '100%',
-    },
-    header: {
-        marginBottom: 40,
-    },
-    title: {
-        fontSize: 32,
-        fontWeight: 'bold',
-        color: '#111827',
-        marginBottom: 8,
-    },
-    subtitle: {
-        fontSize: 16,
-        color: '#6B7280',
-    },
-    form: {
-        marginBottom: 24,
-    },
-    registerBtn: {
-        marginTop: 24,
-    },
-    footer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 24,
-        paddingBottom: 24,
-    },
-    footerText: {
-        color: '#6B7280',
-        fontSize: 15,
-    },
-    loginText: {
-        color: '#4F46E5',
-        fontWeight: 'bold',
-        fontSize: 15,
-    },
+    safeArea: { flex: 1, backgroundColor: '#FFFFFF' },
+    container: { paddingHorizontal: 24, paddingVertical: 40, justifyContent: 'center', minHeight: '100%' },
+    header: { marginBottom: 40 },
+    title: { fontSize: 32, fontWeight: 'bold', color: '#111827', marginBottom: 8 },
+    subtitle: { fontSize: 16, color: '#6B7280' },
+    form: { marginBottom: 24 },
+    registerBtn: { marginTop: 24 },
+    footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 24, paddingBottom: 24 },
+    footerText: { color: '#6B7280', fontSize: 15 },
+    loginText: { color: '#4F46E5', fontWeight: 'bold', fontSize: 15 },
 });

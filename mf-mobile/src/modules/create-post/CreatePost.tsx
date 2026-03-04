@@ -1,73 +1,91 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, SafeAreaView, Platform, KeyboardAvoidingView, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useFeedStore } from '../../store/useFeedStore';
-import { useAuthStore } from '../../store/useAuthStore';
+import React from 'react';
+import {
+    View,
+    Text,
+    StyleSheet,
+    TextInput,
+    SafeAreaView,
+    Platform,
+    KeyboardAvoidingView,
+    Alert,
+    Image,
+    TouchableOpacity,
+} from 'react-native';
 import { Button } from '../../components/Button';
-import { X } from 'lucide-react-native';
+import { useCreatePost } from './hooks/useCreatePost';
+import { useThemeStore } from '@/store/useThemeStore';
+import { Colors } from '@/constants/Colors';
 
+// region CREATE POST
 export function CreatePost() {
-    const [content, setContent] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const {
+        content,
+        setContent,
+        isSubmitting,
+        error,
+        canSubmit,
+        charCount,
+        isOverLimit,
+        user,
+        avatarUri,
+        handleSubmit,
+        handleCancel,
+    } = useCreatePost();
 
-    const router = useRouter();
-    const addPost = useFeedStore((state) => state.addPost);
-    const user = useAuthStore((state) => state.user);
+    const { theme } = useThemeStore();
+    const colors = Colors[theme];
 
-    const handleSubmit = () => {
-        if (!content.trim()) return;
+    React.useEffect(() => {
+        if (error) Alert.alert('Post Failed', error);
+    }, [error]);
 
-        setIsSubmitting(true);
-        setTimeout(() => {
-            addPost({
-                content,
-                author: {
-                    id: user?.id || '999',
-                    username: user?.username || 'new_user',
-                    fullName: user?.fullName || 'New User',
-                    avatarUrl: user?.avatarUrl || 'https://i.pravatar.cc/150?u=e042581f4e29026704d'
-                }
-            });
-            setIsSubmitting(false);
-            setContent('');
-            router.push('/(tabs)');
-        }, 1000);
-    };
-
+    // region Main UI
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
             <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={styles.container}
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                style={[styles.container, { backgroundColor: colors.background }]}
             >
-                <View style={styles.header}>
-                    <Text style={styles.headerTitle}>Create Post</Text>
+                {/* Header */}
+                <View style={[styles.header, { borderBottomColor: colors.border }]}>
+                    <TouchableOpacity onPress={handleCancel} style={styles.cancelBtn}>
+                        <Text style={[styles.cancelText, { color: colors.textSecondary }]}>Cancel</Text>
+                    </TouchableOpacity>
+                    <Text style={[styles.headerTitle, { color: colors.text }]}>New Post</Text>
                     <Button
                         title="Publish"
                         onPress={handleSubmit}
-                        disabled={!content.trim()}
+                        disabled={!canSubmit}
                         isLoading={isSubmitting}
                         style={styles.publishBtn}
                     />
                 </View>
 
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="What's happening?"
-                        placeholderTextColor="#9CA3AF"
-                        multiline
-                        autoFocus
-                        maxLength={280}
-                        value={content}
-                        onChangeText={setContent}
-                        textAlignVertical="top"
-                    />
+                {/* Compose area */}
+                <View style={styles.composeRow}>
+                    <Image source={{ uri: avatarUri }} style={[styles.avatar, { borderColor: colors.surface }]} />
+                    <View style={styles.inputWrapper}>
+                        <Text style={[styles.authorName, { color: colors.text }]}>
+                            {user?.fullName || user?.username || 'You'}
+                        </Text>
+                        <TextInput
+                            style={[styles.input, { color: colors.text }]}
+                            placeholder="What's on your mind?"
+                            placeholderTextColor={colors.textSecondary}
+                            multiline
+                            autoFocus
+                            value={content}
+                            onChangeText={setContent}
+                            textAlignVertical="top"
+                            scrollEnabled={false}
+                        />
+                    </View>
                 </View>
 
-                <View style={styles.footer}>
-                    <Text style={[styles.charCount, content.length > 250 && styles.charCountWarning]}>
-                        {content.length}/280
+                {/* Footer with char count */}
+                <View style={[styles.footer, { borderTopColor: colors.border }]}>
+                    <Text style={[styles.charCount, isOverLimit ? { color: colors.danger } : { color: colors.textSecondary }]}>
+                        {280 - charCount} characters left
                     </Text>
                 </View>
             </KeyboardAvoidingView>
@@ -75,57 +93,37 @@ export function CreatePost() {
     );
 }
 
+// region STYLES-SHEET
 const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        backgroundColor: '#FFFFFF',
-        paddingTop: Platform.OS === 'android' ? 30 : 0
-    },
-    container: {
-        flex: 1,
-    },
+    safeArea: { flex: 1, backgroundColor: '#FFFFFF', paddingTop: Platform.OS === 'android' ? 30 : 0 },
+    container: { flex: 1 },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingVertical: 12,
         borderBottomWidth: 1,
         borderBottomColor: '#F3F4F6',
     },
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#111827',
-    },
-    publishBtn: {
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-        borderRadius: 20,
-    },
-    inputContainer: {
-        flex: 1,
-        padding: 20,
-    },
-    input: {
-        flex: 1,
-        fontSize: 18,
-        color: '#111827',
-        lineHeight: 26,
-    },
+    cancelBtn: { paddingVertical: 4, paddingHorizontal: 4, minWidth: 60 },
+    cancelText: { fontSize: 16, color: '#6B7280', fontWeight: '500' },
+    headerTitle: { fontSize: 17, fontWeight: '700', color: '#111827' },
+    publishBtn: { paddingVertical: 8, paddingHorizontal: 18, borderRadius: 20, minWidth: 80 },
+    composeRow: { flexDirection: 'row', padding: 20, flex: 1 },
+    avatar: { width: 46, height: 46, borderRadius: 23, marginRight: 14, backgroundColor: '#E5E7EB', marginTop: 2 },
+    inputWrapper: { flex: 1 },
+    authorName: { fontWeight: '700', fontSize: 15, color: '#111827', marginBottom: 6 },
+    input: { flex: 1, fontSize: 18, color: '#111827', lineHeight: 26, minHeight: 100 },
     footer: {
-        padding: 16,
+        paddingHorizontal: 20,
+        paddingVertical: 14,
         borderTopWidth: 1,
         borderTopColor: '#F3F4F6',
         flexDirection: 'row',
         justifyContent: 'flex-end',
+        alignItems: 'center',
     },
-    charCount: {
-        fontSize: 14,
-        color: '#6B7280',
-        fontWeight: '500',
-    },
-    charCountWarning: {
-        color: '#EF4444',
-    }
+    charCount: { fontSize: 13, color: '#9CA3AF', fontWeight: '500' },
+    charCountWarning: { color: '#EF4444', fontWeight: '700' },
 });

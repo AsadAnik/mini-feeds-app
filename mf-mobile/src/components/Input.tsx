@@ -1,55 +1,67 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
     View,
     TextInput,
     Text,
     StyleSheet,
-    TextInputProps
+    TextInputProps,
+    ViewStyle,
+    StyleProp
 } from 'react-native';
+import { useThemeStore } from '@/store/useThemeStore';
+import { Colors } from '@/constants/Colors';
 
 interface InputProps extends TextInputProps {
     label?: string;
     error?: string;
     leftIcon?: React.ReactNode;
     rightIcon?: React.ReactNode;
+    containerStyle?: StyleProp<ViewStyle>;
 }
 
+// region INPUT
 export function Input({
     label,
     error,
     leftIcon,
     rightIcon,
     style,
+    containerStyle,
     ...props
 }: InputProps) {
-    const [isFocused, setIsFocused] = useState(false);
+    const { theme } = useThemeStore();
+    const colors = Colors[theme];
 
+    // region Main UI
     return (
-        <View style={styles.container}>
-            {label && <Text style={styles.label}>{label}</Text>}
+        <View style={[styles.container, containerStyle]}>
+            {label && <Text style={[styles.label, { color: colors.text }]}>{label}</Text>}
             <View
                 style={[
                     styles.inputContainer,
-                    isFocused && styles.inputContainerFocused,
+                    {
+                        backgroundColor: colors.inputBackground,
+                        borderColor: error ? colors.danger : colors.border
+                    },
                     error && styles.inputContainerError,
-                    style,
                 ]}
             >
                 {leftIcon && <View style={styles.iconLeft}>{leftIcon}</View>}
                 <TextInput
-                    style={styles.input}
-                    placeholderTextColor="#9CA3AF"
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={() => setIsFocused(false)}
+                    style={[styles.input, { color: colors.text }, style]}
+                    placeholderTextColor={colors.textSecondary}
+                    autoCorrect={false}
+                    pointerEvents="auto"
                     {...props}
                 />
                 {rightIcon && <View style={styles.iconRight}>{rightIcon}</View>}
             </View>
-            {error && <Text style={styles.errorText}>{error}</Text>}
+            {error && <Text style={[styles.errorText, { color: colors.danger }]}>{error}</Text>}
         </View>
     );
 }
 
+// region STYLES-SHEET
 const styles = StyleSheet.create({
     container: {
         marginBottom: 16,

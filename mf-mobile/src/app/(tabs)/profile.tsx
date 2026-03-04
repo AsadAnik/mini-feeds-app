@@ -1,2 +1,2 @@
-import { Profile } from '../../modules/profile';
+import { Profile } from '@/modules/profile';
 export default Profile;

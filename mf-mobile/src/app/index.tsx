@@ -2,7 +2,11 @@ import { Redirect } from 'expo-router';
 import { useAuthStore } from '../store/useAuthStore';
 
 export default function Entry() {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const { isAuthenticated, hasSeenOnboarding } = useAuthStore();
+
+  if (!hasSeenOnboarding) {
+    return <Redirect href="/onboarding" />;
+  }
 
   if (isAuthenticated) {
     return <Redirect href="/(tabs)" />;

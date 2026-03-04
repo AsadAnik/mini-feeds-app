@@ -1,100 +1,159 @@
 import { create } from 'zustand';
+import { api } from '../services/api';
+
+export interface PostAuthor {
+    id: string;
+    email: string;
+    username?: string;
+    fullName?: string;
+}
 
 export interface Post {
     id: string;
-    author: {
-        id: string;
-        username: string;
-        fullName: string;
-        avatarUrl: string;
-    };
     content: string;
-    likes: number;
-    commentsOriginal: number;
+    authorId: string;
+    author: PostAuthor;
     createdAt: string;
-    isLikedByMe: boolean;
+    updatedAt: string;
+    _count: {
+        likes: number;
+        comments: number;
+    };
+    isLikedByMe?: boolean;
+}
+
+export interface Comment {
+    id: string;
+    content: string;
+    authorId: string;
+    postId: string;
+    author: PostAuthor;
+    createdAt: string;
+    updatedAt: string;
+}
+
+interface Pagination {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
 }
 
 interface FeedState {
+    // Posts / feed
     posts: Post[];
-    addPost: (post: Omit<Post, 'id' | 'likes' | 'commentsOriginal' | 'isLikedByMe' | 'createdAt'>) => void;
-    toggleLike: (postId: string) => void;
+    pagination: Pagination | null;
+    isLoadingPosts: boolean;
+    isFetchingMore: boolean;
     searchQuery: string;
+
+    // Actions
+    fetchPosts: (page?: number, replace?: boolean) => Promise<void>;
+    fetchMorePosts: () => Promise<void>;
+    toggleLike: (postId: string) => Promise<void>;
+    deletePost: (postId: string) => Promise<void>;
+    addPostLocally: (post: Post) => void;
     setSearchQuery: (query: string) => void;
 }
 
-const mockPosts: Post[] = [
-    {
-        id: '1',
-        author: {
-            id: '101',
-            username: 'janesmith',
-            fullName: 'Jane Smith',
-            avatarUrl: 'https://i.pravatar.cc/150?u=b042581f4e29026704d'
-        },
-        content: 'Just launched my new app! So excited to share it with the world. Let me know what you think! 🚀🔥',
-        likes: 42,
-        commentsOriginal: 5,
-        createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-        isLikedByMe: false,
-    },
-    {
-        id: '2',
-        author: {
-            id: '102',
-            username: 'mike_dev',
-            fullName: 'Mike Developer',
-            avatarUrl: 'https://i.pravatar.cc/150?u=c042581f4e29026704d'
-        },
-        content: 'React Native vs Flutter? What is your choice for 2026? I am leaning heavily towards React Native because of the mature ecosystem and OTA updates.',
-        likes: 128,
-        commentsOriginal: 34,
-        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-        isLikedByMe: true,
-    },
-    {
-        id: '3',
-        author: {
-            id: '103',
-            username: 'sarah_ui',
-            fullName: 'Sarah UI',
-            avatarUrl: 'https://i.pravatar.cc/150?u=d042581f4e29026704d'
-        },
-        content: 'Design tip: Whitespace is your friend. Do not be afraid to let your UI breathe! ✨',
-        likes: 89,
-        commentsOriginal: 12,
-        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
-        isLikedByMe: false,
-    }
-];
-
-export const useFeedStore = create<FeedState>((set) => ({
-    posts: mockPosts,
+export const useFeedStore = create<FeedState>((set, get) => ({
+    posts: [],
+    pagination: null,
+    isLoadingPosts: false,
+    isFetchingMore: false,
     searchQuery: '',
+
     setSearchQuery: (query) => set({ searchQuery: query }),
-    addPost: (postData) => set((state) => ({
-        posts: [
-            {
-                id: Math.random().toString(36).substring(7),
-                ...postData,
-                likes: 0,
-                commentsOriginal: 0,
-                createdAt: new Date().toISOString(),
-                isLikedByMe: false,
-            },
-            ...state.posts,
-        ]
-    })),
-    toggleLike: (postId) => set((state) => ({
-        posts: state.posts.map((post) => {
-            if (post.id === postId) {
-                return {
-                    ...post,
-                    isLikedByMe: !post.isLikedByMe,
-                    likes: post.isLikedByMe ? post.likes - 1 : post.likes + 1,
-                }
+
+    // region Fetch Posts
+    fetchPosts: async (page = 1, replace = true) => {
+        if (replace) set({ isLoadingPosts: true });
+        else set({ isFetchingMore: true });
+
+        try {
+            const response = await api.get(`/posts?page=${page}&limit=10`);
+            if (response.data?.success) {
+                const newPosts: Post[] = response.data.data;
+                set((state) => ({
+                    posts: replace ? newPosts : [...state.posts, ...newPosts],
+                    pagination: response.data.pagination,
+                }));
             }
-            return post;
-        })
-    }))
+        } catch (error) {
+            console.error('Error fetching posts:', error);
+        } finally {
+            set({ isLoadingPosts: false, isFetchingMore: false });
+        }
+    },
+
+    // region Fetch More Posts (Infinite Scroll)
+    fetchMorePosts: async () => {
+        const { pagination, isFetchingMore, isLoadingPosts, fetchPosts } = get();
+        if (isFetchingMore || isLoadingPosts) return;
+        if (!pagination || pagination.page >= pagination.totalPages) return;
+
+        await fetchPosts(pagination.page + 1, false);
+    },
+
+    // region Toggle Like
+    toggleLike: async (postId: string) => {
+        // Optimistic update
+        set((state) => ({
+            posts: state.posts.map((p) =>
+                p.id === postId
+                    ? {
+                        ...p,
+                        isLikedByMe: !p.isLikedByMe,
+                        _count: {
+                            ...p._count,
+                            likes: p.isLikedByMe
+                                ? p._count.likes - 1
+                                : p._count.likes + 1,
+                        },
+                    }
+                    : p
+            ),
+        }));
+
+        try {
+            await api.post(`/posts/${postId}/like`);
+        } catch (error) {
+            // Revert on failure
+            set((state) => ({
+                posts: state.posts.map((p) =>
+                    p.id === postId
+                        ? {
+                            ...p,
+                            isLikedByMe: !p.isLikedByMe,
+                            _count: {
+                                ...p._count,
+                                likes: p.isLikedByMe
+                                    ? p._count.likes - 1
+                                    : p._count.likes + 1,
+                            },
+                        }
+                        : p
+                ),
+            }));
+            console.error('Error toggling like:', error);
+        }
+    },
+
+    // region Delete Post
+    deletePost: async (postId: string) => {
+        try {
+            await api.delete(`/posts/${postId}`);
+            set((state) => ({
+                posts: state.posts.filter((p) => p.id !== postId),
+            }));
+        } catch (error) {
+            console.error('Error deleting post:', error);
+            throw error;
+        }
+    },
+
+    // region Add Post (used after creating a new post)
+    addPostLocally: (post: Post) => {
+        set((state) => ({ posts: [post, ...state.posts] }));
+    },
 }));

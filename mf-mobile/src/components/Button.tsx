@@ -6,6 +6,8 @@ import {
     ActivityIndicator,
     TouchableOpacityProps
 } from 'react-native';
+import { useThemeStore } from '@/store/useThemeStore';
+import { Colors } from '@/constants/Colors';
 
 interface ButtonProps extends TouchableOpacityProps {
     title: string;
@@ -13,6 +15,7 @@ interface ButtonProps extends TouchableOpacityProps {
     isLoading?: boolean;
 }
 
+// region BUTTON
 export function Button({
     title,
     variant = 'primary',
@@ -20,11 +23,14 @@ export function Button({
     style,
     ...props
 }: ButtonProps) {
+    const { theme } = useThemeStore();
+    const colors = Colors[theme];
     const isPrimary = variant === 'primary';
     const isSecondary = variant === 'secondary';
     const isOutline = variant === 'outline';
     const isGhost = variant === 'ghost';
 
+    // region Main UI
     return (
         <TouchableOpacity
             activeOpacity={0.8}
@@ -40,15 +46,15 @@ export function Button({
             {...props}
         >
             {isLoading ? (
-                <ActivityIndicator color={isPrimary ? '#fff' : '#4F46E5'} />
+                <ActivityIndicator color={isPrimary ? '#fff' : colors.primary} />
             ) : (
                 <Text
                     style={[
                         styles.text,
                         isPrimary && styles.primaryText,
-                        isSecondary && styles.secondaryText,
-                        isOutline && styles.outlineText,
-                        isGhost && styles.ghostText,
+                        isSecondary && [styles.secondaryText, { color: colors.primary }],
+                        isOutline && [styles.outlineText, { color: colors.primary }],
+                        isGhost && [styles.ghostText, { color: colors.textSecondary }],
                     ]}
                 >
                     {title}
@@ -58,6 +64,7 @@ export function Button({
     );
 }
 
+// region Main UI
 const styles = StyleSheet.create({
     button: {
         paddingVertical: 14,
@@ -97,12 +104,9 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     secondaryText: {
-        color: '#4F46E5',
     },
     outlineText: {
-        color: '#4F46E5',
     },
     ghostText: {
-        color: '#6B7280', // Gray-500
     },
 });
