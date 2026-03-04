@@ -1,2 +1,2 @@
-import { Notification } from '../../modules/notification';
+import { Notification } from '@/modules/notification';
 export default Notification;
