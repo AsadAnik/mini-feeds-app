@@ -10,6 +10,7 @@ import {
     ScrollView,
     ActivityIndicator,
     RefreshControl,
+    StatusBar,
 } from 'react-native';
 import { LogOut, Moon, Sun, ChevronRight } from 'lucide-react-native';
 import { useProfile } from './hooks/useProfile';
@@ -140,7 +141,7 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: '#FFFFFF',
-        paddingTop: Platform.OS === 'android' ? 30 : 0
+        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0
     },
     loadingContainer: {
         flex: 1,

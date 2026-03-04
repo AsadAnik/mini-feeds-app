@@ -7,6 +7,7 @@ import {
     Platform,
     TouchableOpacity,
     SafeAreaView,
+    ScrollView,
     Alert,
 } from 'react-native';
 import { Mail, Lock } from 'lucide-react-native';
@@ -37,62 +38,68 @@ export function Login() {
 
     // region Main UI
     return (
-        <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-            <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                style={[styles.container, { backgroundColor: colors.background }]}
-            >
-                <View style={styles.header}>
-                    <Text style={[styles.title, { color: colors.text }]}>Welcome Back</Text>
-                    <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Sign in to continue to MiniFeeds</Text>
-                </View>
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
+            style={{ flex: 1, backgroundColor: colors.background }}
+        >
+            <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+                <ScrollView
+                    contentContainerStyle={[styles.container, { backgroundColor: colors.background }]}
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                >
+                    <View style={styles.header}>
+                        <Text style={[styles.title, { color: colors.text }]}>Welcome Back</Text>
+                        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Sign in to continue to MiniFeeds</Text>
+                    </View>
 
-                <View style={styles.form}>
-                    <Input
-                        label="Email"
-                        placeholder="Enter your email"
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                        value={email}
-                        onChangeText={setEmail}
-                        leftIcon={<Mail size={20} color={colors.textSecondary} />}
-                    />
-                    <Input
-                        label="Password"
-                        placeholder="Enter your password"
-                        secureTextEntry
-                        value={password}
-                        onChangeText={setPassword}
-                        leftIcon={<Lock size={20} color={colors.textSecondary} />}
-                    />
+                    <View style={styles.form}>
+                        <Input
+                            label="Email"
+                            placeholder="Enter your email"
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                            value={email}
+                            onChangeText={setEmail}
+                            leftIcon={<Mail size={20} color={colors.textSecondary} />}
+                        />
+                        <Input
+                            label="Password"
+                            placeholder="Enter your password"
+                            secureTextEntry
+                            value={password}
+                            onChangeText={setPassword}
+                            leftIcon={<Lock size={20} color={colors.textSecondary} />}
+                        />
 
-                    <TouchableOpacity style={styles.forgotPassword}>
-                        <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-                    </TouchableOpacity>
+                        <TouchableOpacity style={styles.forgotPassword}>
+                            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+                        </TouchableOpacity>
 
-                    <Button
-                        title="Sign In"
-                        onPress={handleLogin}
-                        isLoading={isLoading}
-                        style={styles.loginBtn}
-                    />
-                </View>
+                        <Button
+                            title="Sign In"
+                            onPress={handleLogin}
+                            isLoading={isLoading}
+                            style={styles.loginBtn}
+                        />
+                    </View>
 
-                <View style={styles.footer}>
-                    <Text style={[styles.footerText, { color: colors.textSecondary }]}>Don't have an account? </Text>
-                    <TouchableOpacity onPress={() => router.push('/register')}>
-                        <Text style={[styles.registerText, { color: colors.primary }]}>Sign Up</Text>
-                    </TouchableOpacity>
-                </View>
-            </KeyboardAvoidingView>
-        </SafeAreaView>
+                    <View style={styles.footer}>
+                        <Text style={[styles.footerText, { color: colors.textSecondary }]}>Don't have an account? </Text>
+                        <TouchableOpacity onPress={() => router.push('/register')}>
+                            <Text style={[styles.registerText, { color: colors.primary }]}>Sign Up</Text>
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
+            </SafeAreaView>
+        </KeyboardAvoidingView>
     );
 }
 
 // region STYLES-SHEET
 const styles = StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: '#FFFFFF' },
-    container: { flex: 1, paddingHorizontal: 24, justifyContent: 'center' },
+    container: { paddingHorizontal: 24, justifyContent: 'center', flexGrow: 1, paddingVertical: 40 },
     header: { marginBottom: 40 },
     title: { fontSize: 32, fontWeight: 'bold', color: '#111827', marginBottom: 8 },
     subtitle: { fontSize: 16, color: '#6B7280' },

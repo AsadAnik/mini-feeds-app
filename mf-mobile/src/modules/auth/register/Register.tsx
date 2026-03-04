@@ -39,11 +39,11 @@ export function Register() {
 
     // region Main UI
     return (
-        <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-            <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                style={{ flex: 1 }}
-            >
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
+            style={{ flex: 1, backgroundColor: colors.background }}
+        >
+            <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
                 <ScrollView
                     contentContainerStyle={[styles.container, { backgroundColor: colors.background }]}
                     showsVerticalScrollIndicator={false}
@@ -103,15 +103,15 @@ export function Register() {
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
-            </KeyboardAvoidingView>
-        </SafeAreaView>
+            </SafeAreaView>
+        </KeyboardAvoidingView>
     );
 }
 
 // region STYLES-SHEET
 const styles = StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: '#FFFFFF' },
-    container: { paddingHorizontal: 24, paddingVertical: 40, justifyContent: 'center', minHeight: '100%' },
+    container: { paddingHorizontal: 24, paddingVertical: 40, justifyContent: 'center', flexGrow: 1 },
     header: { marginBottom: 40 },
     title: { fontSize: 32, fontWeight: 'bold', color: '#111827', marginBottom: 8 },
     subtitle: { fontSize: 16, color: '#6B7280' },
