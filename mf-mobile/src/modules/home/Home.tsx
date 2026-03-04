@@ -7,7 +7,7 @@ import {
     SafeAreaView,
     Platform,
     Text,
-    ActivityIndicator,
+    StatusBar,
 } from 'react-native';
 import { PostCard } from './components/PostCard';
 import { Input } from '../../components/Input';
@@ -97,7 +97,7 @@ export function Home() {
 
 // region STYLES-SHEET
 const styles = StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: '#FFFFFF', paddingTop: Platform.OS === 'android' ? 30 : 0 },
+    safeArea: { flex: 1, backgroundColor: '#FFFFFF', paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 },
     container: { flex: 1, backgroundColor: '#F9FAFB' },
     header: {
         backgroundColor: '#FFFFFF',

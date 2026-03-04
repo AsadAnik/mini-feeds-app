@@ -9,9 +9,10 @@ import {
     SafeAreaView,
     StatusBar,
     TouchableOpacity,
+    Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Globe, MessageSquare, Users, Moon, ArrowRight } from 'lucide-react-native';
+import { Globe, MessageSquare, Users, Moon } from 'lucide-react-native';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useThemeStore } from '@/store/useThemeStore';
 import { Colors } from '@/constants/Colors';
@@ -176,8 +177,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'flex-end',
         paddingHorizontal: 24,
-        paddingTop: 20,
-        height: 50,
+        paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) + 16 : 20,
+        minHeight: 50,
     },
     skipText: {
         fontSize: 16,

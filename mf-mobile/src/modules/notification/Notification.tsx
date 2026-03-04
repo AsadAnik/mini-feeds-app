@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, Platform, FlatList, Image } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, Platform, FlatList, Image, StatusBar } from 'react-native';
 import { useThemeStore } from '@/store/useThemeStore';
 import { Colors } from '@/constants/Colors';
 
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: '#FFFFFF',
-        paddingTop: Platform.OS === 'android' ? 30 : 0
+        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0
     },
     header: {
         paddingHorizontal: 20,

@@ -144,10 +144,12 @@ export function CommentsSheet({ visible, postId, onClose }: CommentsSheetProps) 
     // region Main UI
     return (
         <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
-            <View style={styles.overlay}>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
+                style={styles.overlay}
+            >
                 <TouchableOpacity style={styles.backdropPress} activeOpacity={1} onPress={onClose} />
-                <KeyboardAvoidingView
-                    behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                <View
                     style={[styles.sheet, { backgroundColor: colors.card }]}
                 >
                     {/* Handle bar */}
@@ -196,7 +198,7 @@ export function CommentsSheet({ visible, postId, onClose }: CommentsSheetProps) 
                     )}
 
                     {/* Input bar */}
-                    <View style={[styles.inputBar, { borderTopColor: colors.border }]}>
+                    <View style={[styles.inputBar, { borderTopColor: colors.border, paddingBottom: 30 }]}>
                         <TextInput
                             style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
                             placeholder="Write a comment..."
@@ -216,8 +218,8 @@ export function CommentsSheet({ visible, postId, onClose }: CommentsSheetProps) 
                             }
                         </TouchableOpacity>
                     </View>
-                </KeyboardAvoidingView>
-            </View>
+                </View>
+            </KeyboardAvoidingView>
         </Modal>
     );
 }

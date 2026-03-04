@@ -10,6 +10,7 @@ import {
     Alert,
     Image,
     TouchableOpacity,
+    StatusBar,
 } from 'react-native';
 import { Button } from '../../components/Button';
 import { useCreatePost } from './hooks/useCreatePost';
@@ -43,7 +44,8 @@ export function CreatePost() {
     return (
         <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
             <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
+                keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
                 style={[styles.container, { backgroundColor: colors.background }]}
             >
                 {/* Header */}
@@ -95,7 +97,7 @@ export function CreatePost() {
 
 // region STYLES-SHEET
 const styles = StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: '#FFFFFF', paddingTop: Platform.OS === 'android' ? 30 : 0 },
+    safeArea: { flex: 1, backgroundColor: '#FFFFFF', paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 },
     container: { flex: 1 },
     header: {
         flexDirection: 'row',
