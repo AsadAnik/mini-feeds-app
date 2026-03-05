@@ -2,6 +2,7 @@ import PrismaClient from '../prisma';
 import { ICreatePost, IGetPostsQuery, IAddComment, ILikeAction } from '../types/post.types';
 import { ApiError } from '../utils/errors/ApiError';
 import { StatusCodes } from 'http-status-codes';
+import NotificationService from './notification.service';
 
 class PostService {
     /**
@@ -125,6 +126,36 @@ class PostService {
                         postId: action.postId
                     }
                 });
+
+                // Send notification to post author
+                const postWithAuthor = await PrismaClient.post.findUnique({
+                    where: { id: action.postId },
+                    include: { author: true }
+                });
+
+                if (postWithAuthor && postWithAuthor.authorId !== action.userId) {
+                    const liker = await PrismaClient.user.findUnique({ where: { id: action.userId } });
+                    const notificationText = `${liker?.fullName || 'Someone'} liked your post.`;
+
+                    if (postWithAuthor.author.fcmToken) {
+                        NotificationService.sendPushNotification(
+                            postWithAuthor.author.fcmToken,
+                            'New Like!',
+                            notificationText,
+                            { postId: action.postId, type: 'like' }
+                        );
+                    }
+
+                    // Save to database
+                    await NotificationService.saveNotificationToDatabase(
+                        postWithAuthor.authorId,
+                        action.userId,
+                        'like',
+                        notificationText,
+                        action.postId
+                    );
+                }
+
                 return { liked: true, message: 'Post liked successfully' };
             }
         } catch (error) {
@@ -157,11 +188,41 @@ class PostService {
                     author: {
                         select: {
                             id: true,
+                            fullName: true,
                             email: true
                         }
                     }
                 }
             });
+
+            // Send notification to post author
+            const postWithAuthor = await PrismaClient.post.findUnique({
+                where: { id: data.postId },
+                include: { author: true }
+            });
+
+            if (postWithAuthor && postWithAuthor.authorId !== data.authorId) {
+                const notificationText = `${comment.author.fullName || 'Someone'} commented on your post.`;
+
+                if (postWithAuthor.author.fcmToken) {
+                    NotificationService.sendPushNotification(
+                        postWithAuthor.author.fcmToken,
+                        'New Comment!',
+                        `${comment.author.fullName || 'Someone'} commented on your post: "${data.content.substring(0, 30)}${data.content.length > 30 ? '...' : ''}"`,
+                        { postId: data.postId, type: 'comment' }
+                    );
+                }
+
+                // Save to database
+                await NotificationService.saveNotificationToDatabase(
+                    postWithAuthor.authorId,
+                    data.authorId,
+                    'comment',
+                    notificationText,
+                    data.postId
+                );
+            }
+
             return comment;
         } catch (error) {
             console.error('Error in addComment service:', error);

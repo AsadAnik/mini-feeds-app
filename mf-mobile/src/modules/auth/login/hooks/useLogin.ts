@@ -23,8 +23,8 @@ export function useLogin() {
         try {
             await login({ email: email.trim(), password });
             router.replace('/(tabs)');
-        } catch (err: any) {
-            setError(err.message || 'Login failed. Please check your credentials.');
+        } catch (_err: any) {
+            setError('Login failed. Please check your credentials.');
         } finally {
             setIsLoading(false);
         }

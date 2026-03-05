@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useFeedStore } from '@/store/useFeedStore';
+import NotificationService from '@/services/notificationService';
 
 export function useHome() {
     const {
@@ -13,6 +14,20 @@ export function useHome() {
     } = useFeedStore();
 
     const [refreshing, setRefreshing] = useState(false);
+
+    // region Notifications setup
+    useEffect(() => {
+        const setupNotifications = async () => {
+            const token = await NotificationService.registerForPushNotificationsAsync();
+            if (token) {
+                await NotificationService.updateTokenOnBackend(token);
+            }
+        };
+
+        setupNotifications();
+        const cleanup = NotificationService.addNotificationListeners();
+        return cleanup;
+    }, []);
 
     // Fetch first page on mount
     useEffect(() => {

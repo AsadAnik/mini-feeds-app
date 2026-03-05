@@ -58,6 +58,25 @@ class AuthService {
     // region Registration Service
     public async register(userInfo: IRegisterUser): Promise<any> {
         try {
+            // Check if user already exists
+            const existingUser = await PrismaClient.user.findFirst({
+                where: {
+                    OR: [
+                        { email: userInfo.email },
+                        { username: userInfo.username }
+                    ]
+                }
+            });
+
+            if (existingUser) {
+                if (existingUser.email === userInfo.email) {
+                    throw new ApiError(StatusCodes.CONFLICT, `User with email: ${userInfo.email} already exists`);
+                }
+                if (existingUser.username === userInfo.username) {
+                    throw new ApiError(StatusCodes.CONFLICT, `User with username: ${userInfo.username} already exists`);
+                }
+            }
+
             // Hash Password
             userInfo.password = await this.bcryptLib.hashPassword(userInfo.password);
 
@@ -77,7 +96,7 @@ class AuthService {
             return createUser;
 
         } catch (error) {
-            console.error(`Error occcured while register user: ${error}`);
+            console.error(`Error occurred while register user: ${error}`);
             throw error;
         }
     }

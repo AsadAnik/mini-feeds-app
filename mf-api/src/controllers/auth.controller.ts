@@ -15,7 +15,7 @@ class AuthController {
      * @param {Response} res 
      * @param {NextFunction} _next 
      */
-    public register = async (req: Request, res: Response, _next: NextFunction) => {
+    public register = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { email, fullName, username, password } = req.body;
             const createUser = await this.authService.register({ email, fullName, username, password });
@@ -28,7 +28,7 @@ class AuthController {
             });
 
         } catch (error) {
-            res.json({ success: false, error });
+            next(error);
         }
     }
 

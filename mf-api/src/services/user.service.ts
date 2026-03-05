@@ -32,6 +32,49 @@ class UserService {
             throw error;
         }
     }
+
+    /**
+     * Update user's FCM token
+     * @param userId 
+     * @param fcmToken 
+     */
+    public async updateFcmToken(userId: string, fcmToken: string) {
+        try {
+            return await PrismaClient.user.update({
+                where: { id: userId },
+                data: { fcmToken }
+            });
+        } catch (error) {
+            console.error('Error in updateFcmToken service:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get user notifications
+     * @param userId 
+     * @returns 
+     */
+    public async getUserNotifications(userId: string) {
+        try {
+            return await PrismaClient.notification.findMany({
+                where: { userId },
+                orderBy: { createdAt: 'desc' },
+                include: {
+                    sender: {
+                        select: {
+                            id: true,
+                            fullName: true,
+                            username: true
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error in getUserNotifications service:', error);
+            throw error;
+        }
+    }
 }
 
 export default UserService;

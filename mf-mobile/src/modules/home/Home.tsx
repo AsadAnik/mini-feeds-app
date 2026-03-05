@@ -85,6 +85,7 @@ export function Home() {
                             isFetchingMore ? (
                                 <View style={styles.footerLoader}>
                                     <PostSkeleton />
+                                    <PostSkeleton />
                                 </View>
                             ) : null
                         }
@@ -115,5 +116,5 @@ const styles = StyleSheet.create({
     emptyBox: { paddingTop: 80, alignItems: 'center', gap: 10 },
     emptyIcon: { fontSize: 40 },
     emptyText: { color: '#9CA3AF', fontSize: 16 },
-    footerLoader: { paddingVertical: 20, alignItems: 'center' },
+    footerLoader: { paddingVertical: 20 },
 });
