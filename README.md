@@ -1,6 +1,8 @@
 # Mini Social Feeds App
 
-**Download APK:** [Link will be added here soon]
+**Download & Install App (APK) via Expo:** [https://expo.dev/accounts/asad_anik/projects/mf-app/builds/6260f8c5-b88e-4ab0-9cd6-9c8527a0ff1a]
+
+**Download & Install App (APK) via Drive:** [https://drive.google.com/file/d/1femYu9nvxtpxZ8ayf4VIUH6EBIpkevm-/view?usp=sharing]
 
 ## Summary
 
@@ -21,11 +23,20 @@ Mini Social Feeds App is a premium, full-featured mobile social networking appli
 
 ## App Screenshots
 
+### Onboarding
 <div align="center">
-  <img src="readme_assets/home-light.png" alt="Home Light" width="24%" />
-  <img src="readme_assets/home-dark.png" alt="Home Dark" width="24%" />
-  <img src="readme_assets/notification-light.png" alt="Notification Light" width="24%" />
-  <img src="readme_assets/profile-dark.png" alt="Profile Dark" width="24%" />
+  <img src="readme_assets/onboarding1.png" alt="Onboarding 1" width="45%" />
+  <img src="readme_assets/onboarding2.png" alt="Onboarding 2" width="45%" />
+</div>
+
+### Authentication
+<div align="center">
+  <img src="readme_assets/auth-screens.png" alt="Auth Screens" width="90%" />
+</div>
+
+### Feeds & Home
+<div align="center">
+  <img src="readme_assets/feeds-screens.png" alt="Feeds Screens" width="90%" />
 </div>
 
 ---
@@ -36,7 +47,7 @@ The backend provides a fully documented Swagger API endpoint for seamless integr
 
 🔗 **Link:** [Swagger API Docs](https://mini-feeds-app.onrender.com/api-docs)
 
-![API Documentation](readme_assets/api-doc-swagger.png)
+![API Documentation](readme_assets/api-doc-swger.png)
 
 ---
 
@@ -44,7 +55,7 @@ The backend provides a fully documented Swagger API endpoint for seamless integr
 
 The robust database schema is managed via Prisma ORM, ensuring scalable and reliable data relations between Users, Posts, Comments, and Likes.
 
-![Database Schema](readme_assets/db-screenshot.png)
+![Database Schema](readme_assets/db-ss.png)
 
 ---
 

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "mf-app",
+    "name": "Mini Feeds",
     "slug": "mf-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -8,7 +8,10 @@
     "scheme": "mfapp",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "bundleIdentifier": "com.anonymous.mf-app"
+      "bundleIdentifier": "com.anonymous.mf-app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -40,6 +43,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b0105e86-f146-45be-ab9c-7267c9f17761"
+      }
+    },
+    "owner": "asad_anik"
   }
 }
