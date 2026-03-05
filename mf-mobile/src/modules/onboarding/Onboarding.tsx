@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Globe, MessageSquare, Users, Moon } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useThemeStore } from '@/store/useThemeStore';
 import { Colors } from '@/constants/Colors';
@@ -24,24 +25,40 @@ const slides = [
         title: 'Welcome to MiniFeeds',
         description: 'Your premium space for sharing thoughts and discovering content from people worldwide.',
         icon: Globe,
+        colors: {
+            light: ['#6366F1', '#A855F7', '#EC4899'],
+            dark: ['#312E81', '#581C87', '#701A75']
+        }
     },
     {
         id: '2',
         title: 'Share Your Voice',
         description: 'Express yourself freely without limits. Create text posts, react, and comment instantly.',
         icon: MessageSquare,
+        colors: {
+            light: ['#F97316', '#EF4444', '#EC4899'],
+            dark: ['#7C2D12', '#7F1D1D', '#701A75']
+        }
     },
     {
         id: '3',
         title: 'Connect with Friends',
         description: 'Build your following and engage in meaningful conversations with a vibrant community.',
         icon: Users,
+        colors: {
+            light: ['#10B981', '#3B82F6', '#6366F1'],
+            dark: ['#064E3B', '#1E3A8A', '#312E81']
+        }
     },
     {
         id: '4',
         title: 'Beautiful Dark Mode',
         description: 'A premium, eye-catching experience customized beautifully for both day and night.',
         icon: Moon,
+        colors: {
+            light: ['#1F2937', '#111827', '#000000'],
+            dark: ['#111827', '#030712', '#000000']
+        }
     },
 ];
 
@@ -79,146 +96,223 @@ export function Onboarding() {
     };
 
     return (
-        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-            <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
+        <View style={styles.container}>
+            <StatusBar barStyle="light-content" />
 
-            <View style={styles.skipContainer}>
-                {currentIndex < slides.length - 1 && (
-                    <TouchableOpacity onPress={handleSkip}>
-                        <Text style={[styles.skipText, { color: colors.textSecondary }]}>Skip</Text>
-                    </TouchableOpacity>
-                )}
-            </View>
+            {/* Dynamic Background Gradients */}
+            {slides.map((slide, index) => {
+                const opacity = scrollX.interpolate({
+                    inputRange: [(index - 1) * width, index * width, (index + 1) * width],
+                    outputRange: [0, 1, 0],
+                    extrapolate: 'clamp'
+                });
 
-            <View style={{ flex: 3 }}>
-                <FlatList
-                    data={slides}
-                    renderItem={({ item }) => {
-                        const Icon = item.icon;
-                        return (
-                            <View style={[styles.slide, { width }]}>
-                                <View style={[
-                                    styles.iconContainer,
-                                    {
-                                        backgroundColor: colors.surface,
-                                        shadowColor: colors.shadow,
-                                        borderColor: colors.border
-                                    }
-                                ]}>
-                                    <Icon size={120} color={colors.primary} strokeWidth={1} />
-                                </View>
-                                <Text style={[styles.title, { color: colors.text }]}>{item.title}</Text>
-                                <Text style={[styles.description, { color: colors.textSecondary }]}>{item.description}</Text>
-                            </View>
-                        );
-                    }}
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    pagingEnabled
-                    bounces={false}
-                    keyExtractor={(item) => item.id}
-                    onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {
-                        useNativeDriver: false,
-                    })}
-                    scrollEventThrottle={32}
-                    onViewableItemsChanged={viewableItemsChanged}
-                    viewabilityConfig={viewConfig}
-                    ref={slidesRef}
-                />
-            </View>
+                return (
+                    <Animated.View
+                        key={`bg-${slide.id}`}
+                        style={[StyleSheet.absoluteFill, { opacity }]}
+                    >
+                        <LinearGradient
+                            colors={slide.colors[theme] as any}
+                            style={StyleSheet.absoluteFill}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
+                        />
+                    </Animated.View>
+                );
+            })}
 
-            {/* Pagination & Next Button */}
-            <View style={[styles.footer, { paddingBottom: height * 0.05 }]}>
-                {/* Dots */}
-                <View style={styles.paginator}>
-                    {slides.map((_, i) => {
-                        const inputRange = [(i - 1) * width, i * width, (i + 1) * width];
-
-                        const dotWidth = scrollX.interpolate({
-                            inputRange,
-                            outputRange: [10, 24, 10],
-                            extrapolate: 'clamp',
-                        });
-
-                        const opacity = scrollX.interpolate({
-                            inputRange,
-                            outputRange: [0.3, 1, 0.3],
-                            extrapolate: 'clamp',
-                        });
-
-                        return (
-                            <Animated.View
-                                key={i.toString()}
-                                style={[
-                                    styles.dot,
-                                    { width: dotWidth, opacity, backgroundColor: colors.primary },
-                                ]}
-                            />
-                        );
-                    })}
+            <SafeAreaView style={styles.safeArea}>
+                <View style={styles.skipContainer}>
+                    {currentIndex < slides.length - 1 && (
+                        <TouchableOpacity onPress={handleSkip} activeOpacity={0.7}>
+                            <Text style={styles.skipText}>Skip</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
-                {/* Primary Action Button */}
-                <Button
-                    title={currentIndex === slides.length - 1 ? "Get Started" : "Next"}
-                    onPress={scrollToNext}
-                    style={styles.nextBtn}
-                />
-            </View>
-        </SafeAreaView>
+                <View style={{ flex: 3 }}>
+                    <FlatList
+                        data={slides}
+                        renderItem={({ item, index }) => {
+                            const Icon = item.icon;
+
+                            // Animate content as we scroll
+                            const contentOpacity = scrollX.interpolate({
+                                inputRange: [(index - 0.5) * width, index * width, (index + 0.5) * width],
+                                outputRange: [0, 1, 0],
+                                extrapolate: 'clamp'
+                            });
+
+                            const scale = scrollX.interpolate({
+                                inputRange: [(index - 0.5) * width, index * width, (index + 0.5) * width],
+                                outputRange: [0.8, 1, 0.8],
+                                extrapolate: 'clamp'
+                            });
+
+                            return (
+                                <View style={[styles.slide, { width }]}>
+                                    <Animated.View style={{ opacity: contentOpacity, transform: [{ scale }], alignItems: 'center' }}>
+                                        <View style={styles.glassIconContainer}>
+                                            <View style={styles.iconInner}>
+                                                <Icon size={80} color="#FFFFFF" strokeWidth={1.5} />
+                                            </View>
+                                        </View>
+                                        <Text style={styles.title}>{item.title}</Text>
+                                        <Text style={styles.description}>{item.description}</Text>
+                                    </Animated.View>
+                                </View>
+                            );
+                        }}
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        pagingEnabled
+                        bounces={false}
+                        keyExtractor={(item) => item.id}
+                        onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {
+                            useNativeDriver: false,
+                        })}
+                        scrollEventThrottle={16}
+                        onViewableItemsChanged={viewableItemsChanged}
+                        viewabilityConfig={viewConfig}
+                        ref={slidesRef}
+                    />
+                </View>
+
+                {/* Pagination & Next Button */}
+                <View style={[styles.footer, { paddingBottom: height * 0.05 }]}>
+                    {/* Dots */}
+                    <View style={styles.paginator}>
+                        {slides.map((_, i) => {
+                            const inputRange = [(i - 1) * width, i * width, (i + 1) * width];
+
+                            const dotWidth = scrollX.interpolate({
+                                inputRange,
+                                outputRange: [8, 20, 8],
+                                extrapolate: 'clamp',
+                            });
+
+                            const opacity = scrollX.interpolate({
+                                inputRange,
+                                outputRange: [0.5, 1, 0.5],
+                                extrapolate: 'clamp',
+                            });
+
+                            return (
+                                <Animated.View
+                                    key={i.toString()}
+                                    style={[
+                                        styles.dot,
+                                        { width: dotWidth, opacity, backgroundColor: '#FFFFFF' },
+                                    ]}
+                                />
+                            );
+                        })}
+                    </View>
+
+                    {/* Primary Action Button */}
+                    <TouchableOpacity
+                        style={styles.nextBtnContainer}
+                        onPress={scrollToNext}
+                        activeOpacity={0.8}
+                    >
+                        <LinearGradient
+                            colors={['rgba(255,255,255,0.3)', 'rgba(255,255,255,0.1)']}
+                            style={styles.nextBtnGradient}
+                        >
+                            <Text style={styles.nextBtnText}>
+                                {currentIndex === slides.length - 1 ? "Get Started" : "Next"}
+                            </Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                </View>
+            </SafeAreaView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#000',
+    },
+    safeArea: {
+        flex: 1,
     },
     skipContainer: {
         flexDirection: 'row',
         justifyContent: 'flex-end',
         paddingHorizontal: 24,
-        paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) + 16 : 20,
-        minHeight: 50,
+        paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) + 16 : 10,
+        height: 60,
     },
     skipText: {
         fontSize: 16,
-        fontWeight: '600',
+        fontWeight: '700',
+        color: 'rgba(255,255,255,0.8)',
+        letterSpacing: 0.5,
     },
     slide: {
         flex: 1,
         alignItems: 'center',
+        paddingHorizontal: 40,
         justifyContent: 'center',
-        paddingHorizontal: 30,
     },
-    iconContainer: {
-        width: 200,
-        height: 200,
-        borderRadius: 100,
+    glassIconContainer: {
+        width: 180,
+        height: 180,
+        borderRadius: 90,
+        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.25)',
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 50,
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.1,
-        shadowRadius: 20,
-        elevation: 5,
-        borderWidth: 1,
+        marginBottom: 60,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 10 },
+                shadowOpacity: 0.3,
+                shadowRadius: 15,
+            },
+            android: {
+                elevation: 10,
+            }
+        })
+    },
+    iconInner: {
+        width: 140,
+        height: 140,
+        borderRadius: 70,
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 0.5,
+        borderColor: 'rgba(255, 255, 255, 0.2)',
     },
     title: {
-        fontWeight: '800',
-        fontSize: 28,
-        marginBottom: 16,
+        fontWeight: '900',
+        fontSize: 32,
+        marginBottom: 20,
         textAlign: 'center',
+        color: '#FFFFFF',
+        letterSpacing: -0.5,
+        textShadowColor: 'rgba(0, 0, 0, 0.2)',
+        textShadowOffset: { width: 0, height: 2 },
+        textShadowRadius: 4,
     },
     description: {
-        fontSize: 16,
+        fontSize: 18,
         textAlign: 'center',
-        lineHeight: 24,
+        lineHeight: 28,
+        color: 'rgba(255, 255, 255, 0.9)',
+        fontWeight: '500',
         paddingHorizontal: 10,
     },
     footer: {
         flex: 1,
         justifyContent: 'space-between',
-        paddingHorizontal: 24,
+        paddingHorizontal: 30,
         paddingTop: 20,
     },
     paginator: {
@@ -228,12 +322,27 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     dot: {
-        height: 10,
-        borderRadius: 5,
+        height: 8,
+        borderRadius: 4,
         marginHorizontal: 4,
     },
-    nextBtn: {
-        marginBottom: 10,
+    nextBtnContainer: {
         width: '100%',
+        borderRadius: 20,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.3)',
+        marginBottom: 10,
+    },
+    nextBtnGradient: {
+        paddingVertical: 18,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    nextBtnText: {
+        color: '#FFFFFF',
+        fontSize: 18,
+        fontWeight: '800',
+        letterSpacing: 1,
     },
 });

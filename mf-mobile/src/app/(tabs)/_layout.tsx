@@ -1,7 +1,7 @@
 import React from 'react';
 import { Tabs, Redirect } from 'expo-router';
 import { Home, PlusSquare, Bell, User } from 'lucide-react-native';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { useThemeStore } from '@/store/useThemeStore';
 import { Colors } from '@/constants/Colors';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -21,52 +21,93 @@ export default function TabLayout() {
             headerShown: false,
             tabBarActiveTintColor: colors.primary,
             tabBarInactiveTintColor: colors.textSecondary,
+            tabBarShowLabel: true,
             tabBarLabelStyle: {
-                fontSize: 12,
-                fontWeight: '500',
+                fontSize: 11,
+                fontWeight: '700',
+                marginBottom: Platform.OS === 'ios' ? 0 : 4,
             },
             tabBarStyle: {
-                borderTopWidth: 1,
-                borderTopColor: colors.border,
-                height: Platform.OS === 'ios' ? 92 : 95,
-                paddingBottom: Platform.OS === 'ios' ? 32 : 18,
-                paddingTop: 12,
-                backgroundColor: colors.tabBarBackground,
-                shadowColor: colors.shadow,
-                shadowOffset: { width: 0, height: -2 },
-                shadowOpacity: theme === 'dark' ? 0.2 : 0.05,
-                shadowRadius: 10,
-                elevation: 10,
+                position: 'absolute',
+                bottom: Platform.OS === 'ios' ? 24 : 16,
+                left: 20,
+                right: 20,
+                borderRadius: 25,
+                height: 70,
+                backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                borderTopWidth: 0,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 10 },
+                shadowOpacity: 0.1,
+                shadowRadius: 20,
+                elevation: 5,
+                paddingBottom: Platform.OS === 'ios' ? 0 : 10,
+                paddingTop: 10,
+                borderWidth: 1,
+                marginLeft: 20,
+                marginRight: 20,
+                borderColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.03)',
+            },
+            tabBarItemStyle: {
+                height: 60,
             }
         }}>
             <Tabs.Screen
                 name="index"
                 options={{
                     title: 'Home',
-                    tabBarIcon: ({ color }) => <Home color={color} size={24} />
+                    tabBarIcon: ({ color, focused }) => (
+                        <View style={focused ? styles.activeIconBg : null}>
+                            <Home color={color} size={24} strokeWidth={focused ? 2.5 : 2} />
+                        </View>
+                    )
                 }}
             />
             <Tabs.Screen
                 name="create"
                 options={{
-                    title: 'Create',
-                    tabBarIcon: ({ color }) => <PlusSquare color={color} size={24} />
+                    title: 'Share',
+                    tabBarIcon: ({ color, focused }) => (
+                        <View style={focused ? styles.activeIconBg : null}>
+                            <PlusSquare color={color} size={24} strokeWidth={focused ? 2.5 : 2} />
+                        </View>
+                    )
                 }}
             />
             <Tabs.Screen
                 name="notification"
                 options={{
                     title: 'Activity',
-                    tabBarIcon: ({ color }) => <Bell color={color} size={24} />
+                    tabBarIcon: ({ color, focused }) => (
+                        <View style={focused ? styles.activeIconBg : null}>
+                            <Bell color={color} size={24} strokeWidth={focused ? 2.5 : 2} />
+                        </View>
+                    )
                 }}
             />
             <Tabs.Screen
                 name="profile"
                 options={{
-                    title: 'Profile',
-                    tabBarIcon: ({ color }) => <User color={color} size={24} />
+                    title: 'Me',
+                    tabBarIcon: ({ color, focused }) => (
+                        <View style={focused ? styles.activeIconBg : null}>
+                            <User color={color} size={24} strokeWidth={focused ? 2.5 : 2} />
+                        </View>
+                    )
                 }}
             />
         </Tabs>
     );
 }
+
+const styles = StyleSheet.create({
+    activeIconBg: {
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 2,
+    }
+});
