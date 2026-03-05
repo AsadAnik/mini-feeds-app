@@ -18,7 +18,7 @@ interface AuthState {
 
     login: (credentials: any) => Promise<void>;
     register: (data: any) => Promise<void>;
-    logout: () => Promise<void>;
+    logout: (localOnly?: boolean) => Promise<void>;
     checkAuth: () => Promise<void>;
     completeOnboarding: () => Promise<void>;
 }
@@ -73,11 +73,13 @@ export const useAuthStore = create<AuthState>((set) => ({
     },
 
     // region Logout Auth
-    logout: async () => {
-        try {
-            await api.get('/auth/logout');
-        } catch (error) {
-            console.log("Logged out failed at server, clearing local storage", error);
+    logout: async (localOnly: boolean = false) => {
+        if (!localOnly) {
+            try {
+                await api.get('/auth/logout');
+            } catch (error) {
+                console.log("Logged out failed at server, clearing local storage", error);
+            }
         }
         await AsyncStorage.removeItem('@access_token');
         await AsyncStorage.removeItem('@user_data');

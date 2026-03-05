@@ -1,14 +1,20 @@
 import React from 'react';
-import { Tabs } from 'expo-router';
+import { Tabs, Redirect } from 'expo-router';
 import { Home, PlusSquare, Bell, User } from 'lucide-react-native';
 import { Platform, StyleSheet } from 'react-native';
 import { useThemeStore } from '@/store/useThemeStore';
 import { Colors } from '@/constants/Colors';
+import { useAuthStore } from '@/store/useAuthStore';
 
 // region TAB-LAYOUT
 export default function TabLayout() {
     const { theme } = useThemeStore();
     const colors = Colors[theme];
+    const { isAuthenticated } = useAuthStore();
+
+    if (!isAuthenticated) {
+        return <Redirect href="/(auth)/login" />;
+    }
 
     return (
         <Tabs screenOptions={{
