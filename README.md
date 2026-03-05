@@ -25,18 +25,18 @@ Mini Social Feeds App is a premium, full-featured mobile social networking appli
 
 ### Onboarding
 <div align="center">
-  <img src="readme_assets/onboarding1.png" alt="Onboarding 1" width="45%" />
-  <img src="readme_assets/onboarding2.png" alt="Onboarding 2" width="45%" />
+  <img src="readme_assets/onboarding1.png" alt="Onboarding 1" width="30%" />
+  <img src="readme_assets/onboarding2.png" alt="Onboarding 2" width="30%" />
 </div>
 
 ### Authentication
 <div align="center">
-  <img src="readme_assets/auth-screens.png" alt="Auth Screens" width="90%" />
+  <img src="readme_assets/auth-screens.png" alt="Auth Screens" width="60%" />
 </div>
 
 ### Feeds & Home
 <div align="center">
-  <img src="readme_assets/feeds-screens.png" alt="Feeds Screens" width="90%" />
+  <img src="readme_assets/feeds-screens.png" alt="Feeds Screens" width="60%" />
 </div>
 
 ---
