@@ -9,11 +9,13 @@ import {
     Text,
     StatusBar,
     Animated,
+    TouchableOpacity,
 } from 'react-native';
+import { Link } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { PostCard } from './components/PostCard';
 import { Input } from '../../components/Input';
-import { Search } from 'lucide-react-native';
+import { Search, MessageCircle, Users } from 'lucide-react-native';
 import { useHome } from './hooks/useHome';
 import { PostSkeleton } from './components/PostSkeleton';
 import { useThemeStore } from '@/store/useThemeStore';
@@ -82,9 +84,26 @@ export function Home() {
                         theme === 'dark' ? styles.headerDark : styles.headerLight
                     ]}>
                         <View style={styles.headerTop}>
-                            <Text style={[styles.headerTitle, { color: colors.text }]}>Feeds</Text>
-                            <View style={[styles.titleBadge, { backgroundColor: colors.primary }]}>
-                                <Text style={styles.badgeText}>{filteredPosts.length}</Text>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Text style={[styles.headerTitle, { color: colors.text }]}>Feeds</Text>
+                                <View style={[styles.titleBadge, { backgroundColor: colors.primary }]}>
+                                    <Text style={styles.badgeText}>{filteredPosts.length}</Text>
+                                </View>
+                            </View>
+
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                                <Link href="/friends" asChild>
+                                    <TouchableOpacity style={StyleSheet.flatten([styles.headerIconWrapper, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }])}>
+                                        <Users size={22} color={colors.text} />
+                                    </TouchableOpacity>
+                                </Link>
+
+                                <Link href="/chat" asChild>
+                                    <TouchableOpacity style={StyleSheet.flatten([styles.headerIconWrapper, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }])}>
+                                        <MessageCircle size={22} color={colors.text} />
+                                        <View style={[styles.onlineDot, { backgroundColor: colors.primary }]} />
+                                    </TouchableOpacity>
+                                </Link>
                             </View>
                         </View>
 
@@ -173,7 +192,26 @@ const styles = StyleSheet.create({
     headerTop: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
         marginBottom: 14,
+    },
+    headerIconWrapper: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
+    },
+    onlineDot: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        borderWidth: 2,
+        borderColor: '#ffffff', // You might want this to be dynamic based on theme but white/black overlay works nicely
     },
     headerTitle: {
         fontSize: 30,

@@ -20,13 +20,41 @@ model User {
     notifications     Notification[] @relation("UserNotifications")
     sentNotifications Notification[] @relation("NotificationSender")
 
+    friendships            Friendship[]    @relation("UserFriendships")
+    friendOf               Friendship[]    @relation("FriendFriendships")
+    sentFriendRequests     FriendRequest[] @relation("SentFriendRequests")
+    receivedFriendRequests FriendRequest[] @relation("ReceivedFriendRequests")
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
+model Friendship {
+    id        String   @id @default(uuid())
+    userId    String
+    user      User     @relation("UserFriendships", fields: [userId], references: [id], onDelete: Cascade)
+    friendId  String
+    friend    User     @relation("FriendFriendships", fields: [friendId], references: [id], onDelete: Cascade)
+    createdAt DateTime @default(now())
+
+    @@unique([userId, friendId])
+}
+
+model FriendRequest {
+    id         String   @id @default(uuid())
+    senderId   String
+    sender     User     @relation("SentFriendRequests", fields: [senderId], references: [id], onDelete: Cascade)
+    receiverId String
+    receiver   User     @relation("ReceivedFriendRequests", fields: [receiverId], references: [id], onDelete: Cascade)
+    status     String   @default("PENDING") // PENDING, ACCEPTED, REJECTED
+    createdAt  DateTime @default(now())
+
+    @@unique([senderId, receiverId])
+}
+
 model Notification {
     id      String  @id @default(uuid())
-    type    String // "like" | "comment"
+    type    String // "like" | "comment" | "friend_request" | "friend_accept"
     content String
     isRead  Boolean @default(false)
 
