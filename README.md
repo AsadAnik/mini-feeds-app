@@ -1,8 +1,6 @@
 # Mini Social Feeds App
 
-**Download & Install App (APK) via Expo:** [https://expo.dev/accounts/asad_anik/projects/mf-app/builds/6260f8c5-b88e-4ab0-9cd6-9c8527a0ff1a]
-
-**Download & Install App (APK) via Drive:** [https://drive.google.com/file/d/1femYu9nvxtpxZ8ayf4VIUH6EBIpkevm-/view?usp=sharing]
+**Download & Install App (APK) via Drive:** [https://drive.google.com/file/d/1UaaY9UuDGKIgOiBgus5M2oL6E7PFpmx5/view?usp=sharing]
 
 ## Summary
 
