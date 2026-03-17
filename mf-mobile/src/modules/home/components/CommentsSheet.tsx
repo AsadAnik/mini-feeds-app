@@ -30,6 +30,8 @@ interface CommentsSheetProps {
 
 const LIMIT = 5;
 
+import { AvatarRenderer } from '../../profile/components/AvatarRenderer';
+
 // region COMMENTS SHEET
 export function CommentsSheet({ visible, postId, onClose }: CommentsSheetProps) {
     const [comments, setComments] = useState<Comment[]>([]);
@@ -116,14 +118,20 @@ export function CommentsSheet({ visible, postId, onClose }: CommentsSheetProps) 
 
     const renderComment = ({ item }: { item: Comment }) => {
         const isOwner = user?.id === item.authorId;
-        const authorLabel = item.author?.email?.split('@')[0] || 'user';
+        const authorLabel = item.author?.fullName || item.author?.email?.split('@')[0] || 'user';
         const avatarUri = `https://i.pravatar.cc/80?u=${item.authorId}`;
         return (
             <View style={styles.commentRow}>
-                <Image source={{ uri: avatarUri }} style={[styles.commentAvatar, { borderColor: colors.surface }]} />
+                {item.author?.avatarConfig ? (
+                    <View style={{ marginRight: 10 }}>
+                        <AvatarRenderer config={item.author.avatarConfig} size={36} />
+                    </View>
+                ) : (
+                    <Image source={{ uri: avatarUri }} style={[styles.commentAvatar, { borderColor: colors.surface }]} />
+                )}
                 <View style={[styles.commentBubble, { backgroundColor: colors.surface }]}>
                     <View style={styles.commentHeader}>
-                        <Text style={[styles.commentAuthor, { color: colors.text }]}>@{authorLabel}</Text>
+                        <Text style={[styles.commentAuthor, { color: colors.text }]}>{authorLabel}</Text>
                         <Text style={[styles.commentTime, { color: colors.textSecondary }]}>{timeAgo(item.createdAt)}</Text>
                     </View>
                     <Text style={[styles.commentContent, { color: colors.textSecondary }]}>{item.content}</Text>

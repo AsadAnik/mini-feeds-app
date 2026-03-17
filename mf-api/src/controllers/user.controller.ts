@@ -71,6 +71,36 @@ class UserController {
     }
 
     /**
+     * UPDATE USER PROFILE
+     * @param req 
+     * @param res 
+     * @returns 
+     */
+    public updateProfile = async (req: Request | any, res: Response) => {
+        try {
+            const { fullName, avatarConfig } = req.body;
+            const userId = req.user.id;
+
+            const updatedUser = await this.userService.updateProfile(userId, { fullName, avatarConfig });
+
+            // Remove sensitive information
+            const { password, ...userProfile } = updatedUser;
+
+            return res.status(StatusCodes.OK).json({
+                success: true,
+                message: 'Profile updated successfully',
+                data: userProfile
+            });
+        } catch (error: any) {
+            console.error('Error in UserController.updateProfile:', error);
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                success: false,
+                message: error.message || 'Error occurred while updating profile'
+            });
+        }
+    }
+
+    /**
      * GET NOTIFICATIONS
      * @param req 
      * @param res 
@@ -91,6 +121,38 @@ class UserController {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
                 success: false,
                 message: error.message || 'Error occurred while retrieving notifications'
+            });
+        }
+    }
+    /**
+     * CHANGE PASSWORD
+     * @param req 
+     * @param res 
+     * @returns 
+     */
+    public changePassword = async (req: Request | any, res: Response) => {
+        try {
+            const { oldPassword, newPassword } = req.body;
+            const userId = req.user.id;
+
+            if (!oldPassword || !newPassword) {
+                return res.status(StatusCodes.BAD_REQUEST).json({
+                    success: false,
+                    message: 'Old and new passwords are required'
+                });
+            }
+
+            await this.userService.changePassword(userId, oldPassword, newPassword);
+
+            return res.status(StatusCodes.OK).json({
+                success: true,
+                message: 'Password changed successfully'
+            });
+        } catch (error: any) {
+            console.error('Error in UserController.changePassword:', error);
+            return res.status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR).json({
+                success: false,
+                message: error.message || 'Error occurred while changing password'
             });
         }
     }

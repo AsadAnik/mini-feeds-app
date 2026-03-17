@@ -6,11 +6,12 @@ import {
     KeyboardAvoidingView,
     Platform,
     TouchableOpacity,
-    SafeAreaView,
     ScrollView,
     Alert,
     Animated,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { Mail, Lock, Sparkles } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';

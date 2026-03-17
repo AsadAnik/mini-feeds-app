@@ -4,13 +4,14 @@ import {
     StyleSheet,
     FlatList,
     RefreshControl,
-    SafeAreaView,
     Platform,
     Text,
     StatusBar,
     Animated,
     TouchableOpacity,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { Link } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { PostCard } from './components/PostCard';
@@ -172,7 +173,7 @@ export function Home() {
 
 // region STYLES-SHEET
 const styles = StyleSheet.create({
-    safeArea: { flex: 1, paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 },
+    safeArea: { flex: 1 },
     container: { flex: 1 },
     header: {
         paddingHorizontal: 20,

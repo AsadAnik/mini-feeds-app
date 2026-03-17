@@ -6,6 +6,7 @@ export interface PostAuthor {
     email: string;
     username?: string;
     fullName?: string;
+    avatarConfig?: any;
 }
 
 export interface Post {

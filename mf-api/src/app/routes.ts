@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { authRoutes, postRoutes, userRoutes, friendRoutes } from '../routes';
+import { authRoutes, postRoutes, userRoutes, friendRoutes, chatRoutes } from '../routes';
 
 const router: Router = Router();
 
@@ -11,6 +11,7 @@ router.use('/api/v1/auth', authRoutes);
 router.use('/api/v1/posts', postRoutes);
 router.use('/api/v1/users', userRoutes);
 router.use('/api/v1/friends', friendRoutes);
+router.use('/api/v1/chat', chatRoutes);
 
 /**
  * ---- Health Check for the application here ----

@@ -6,8 +6,6 @@ import {
     Image,
     TouchableOpacity,
     Alert,
-    Modal,
-    Pressable,
 } from 'react-native';
 import { Heart, MessageSquare, MoreHorizontal, Trash2 } from 'lucide-react-native';
 import { Post, useFeedStore } from '../../../store/useFeedStore';
@@ -16,6 +14,9 @@ import { useThemeStore } from '@/store/useThemeStore';
 import { Colors } from '@/constants/Colors';
 import { CommentsSheet } from './CommentsSheet';
 import { timeAgo } from '@/utils/date';
+import { ActionSheet } from '@/components/ActionSheet';
+
+import { AvatarRenderer } from '../../profile/components/AvatarRenderer';
 
 interface PostCardProps {
     post: Post;
@@ -65,10 +66,16 @@ export function PostCard({ post }: PostCardProps) {
         <>
             <View style={[styles.card, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
                 <View style={styles.header}>
-                    <Image
-                        source={{ uri: `https://i.pravatar.cc/150?u=${post.authorId}` }}
-                        style={[styles.avatar, { borderColor: colors.surface }]}
-                    />
+                    {post.author?.avatarConfig ? (
+                        <View style={{ marginRight: 12 }}>
+                            <AvatarRenderer config={post.author.avatarConfig} size={44} />
+                        </View>
+                    ) : (
+                        <Image
+                            source={{ uri: `https://i.pravatar.cc/150?u=${post.authorId}` }}
+                            style={[styles.avatar, { borderColor: colors.surface }]}
+                        />
+                    )}
                     <View style={styles.authorInfo}>
                         <Text style={[styles.fullName, { color: colors.text }]}>
                             {authorName}
@@ -111,20 +118,19 @@ export function PostCard({ post }: PostCardProps) {
                 </View>
             </View>
 
-            {/* 3-dot Menu Modal */}
-            <Modal transparent visible={menuVisible} animationType="fade" onRequestClose={() => setMenuVisible(false)}>
-                <Pressable style={styles.modalOverlay} onPress={() => setMenuVisible(false)}>
-                    <View style={[styles.menuContainer, { backgroundColor: colors.card }]}>
-                        <TouchableOpacity style={styles.menuItem} onPress={handleDelete}>
-                            <Trash2 size={18} color="#EF4444" />
-                            <Text style={styles.menuItemTextDanger}>Delete Post</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.menuCancelItem, { borderTopColor: colors.border }]} onPress={() => setMenuVisible(false)}>
-                            <Text style={[styles.menuCancelText, { color: colors.textSecondary }]}>Cancel</Text>
-                        </TouchableOpacity>
-                    </View>
-                </Pressable>
-            </Modal>
+            <ActionSheet 
+                visible={menuVisible}
+                onClose={() => setMenuVisible(false)}
+                title="Post Options"
+                options={[
+                    {
+                        label: 'Delete Post',
+                        icon: Trash2,
+                        variant: 'danger',
+                        onPress: handleDelete
+                    }
+                ]}
+            />
 
             {/* Comments Sheet */}
             <CommentsSheet
@@ -187,40 +193,6 @@ const styles = StyleSheet.create({
     actionText: {
         marginLeft: 7,
         fontSize: 14,
-        fontWeight: '500',
-    },
-    // Menu modal
-    modalOverlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.45)',
-        justifyContent: 'flex-end',
-    },
-    menuContainer: {
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        paddingBottom: 34,
-        paddingTop: 12,
-    },
-    menuItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 16,
-        paddingHorizontal: 24,
-        gap: 14,
-    },
-    menuItemTextDanger: {
-        fontSize: 16,
-        color: '#EF4444',
-        fontWeight: '600',
-    },
-    menuCancelItem: {
-        borderTopWidth: 1,
-        paddingVertical: 16,
-        alignItems: 'center',
-        marginTop: 4,
-    },
-    menuCancelText: {
-        fontSize: 16,
         fontWeight: '500',
     },
 });

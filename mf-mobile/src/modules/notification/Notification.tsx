@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, Platform, FlatList, Image, StatusBar, RefreshControl, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Platform, FlatList, Image, StatusBar, RefreshControl, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { useThemeStore } from '@/store/useThemeStore';
 import { Colors } from '@/constants/Colors';
 import { useNotificationStore } from '@/store/useNotificationStore';
 import { BellOff, Bell } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { AvatarRenderer } from '../profile/components/AvatarRenderer';
 
 // region NOTIFICATION
 export function Notification() {
@@ -66,7 +69,13 @@ export function Notification() {
                     renderItem={({ item }) => (
                         <View style={[styles.notificationCard, theme === 'dark' ? styles.cardDark : styles.cardLight]}>
                             <View style={styles.avatarWrapper}>
-                                <Image source={{ uri: item.avatar }} style={styles.avatar} />
+                                {item.avatarConfig ? (
+                                    <View style={{ marginRight: 16 }}>
+                                        <AvatarRenderer config={item.avatarConfig} size={54} />
+                                    </View>
+                                ) : (
+                                    <Image source={{ uri: item.avatar }} style={styles.avatar} />
+                                )}
                                 <View style={styles.userIndicator} />
                             </View>
                             <View style={styles.content}>
@@ -85,7 +94,7 @@ export function Notification() {
 
 // region STYLES-SHEET
 const styles = StyleSheet.create({
-    safeArea: { flex: 1, paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 },
+    safeArea: { flex: 1 },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',

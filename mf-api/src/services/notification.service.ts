@@ -10,6 +10,7 @@ class NotificationService {
      * @param content Notification content
      * @param postId Related post ID
      */
+    // region Save Notification
     public async saveNotificationToDatabase(userId: string, senderId: string, type: string, content: string, postId?: string) {
         try {
             await PrismaClient.notification.create({
@@ -33,6 +34,7 @@ class NotificationService {
      * @param body Body of the notification
      * @param data Optional data payload
      */
+    // region Send Push Notification
     public async sendPushNotification(token: string, title: string, body: string, data?: any) {
         if (!admin.apps.length || !token) {
             return;
@@ -53,6 +55,26 @@ class NotificationService {
             return response;
         } catch (error) {
             console.error('Error sending notification:', error);
+        }
+    }
+
+    /**
+     * Update FCM token for a user
+     * @param userId User ID
+     * @param fcmToken FCM token
+     * @returns 
+     */
+    // region Update FCM Token
+    public async updateFcmToken(userId: string, fcmToken: string) {
+        try {
+            await PrismaClient.user.update({
+                where: { id: userId },
+                data: { fcmToken }
+            });
+            return { success: true };
+        } catch (error) {
+            console.error('Error updating FCM token:', error);
+            throw error;
         }
     }
 }

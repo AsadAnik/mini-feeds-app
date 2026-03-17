@@ -41,6 +41,7 @@ class AuthService {
                 email: user.email,
                 fullName: user.fullName,
                 username: user.username,
+                avatarConfig: user.avatarConfig,
                 accessToken,
             };
 

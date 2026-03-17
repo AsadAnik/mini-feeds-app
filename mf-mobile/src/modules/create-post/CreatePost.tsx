@@ -4,7 +4,6 @@ import {
     Text,
     StyleSheet,
     TextInput,
-    SafeAreaView,
     Platform,
     KeyboardAvoidingView,
     Alert,
@@ -12,10 +11,14 @@ import {
     TouchableOpacity,
     StatusBar,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { Button } from '../../components/Button';
 import { useCreatePost } from './hooks/useCreatePost';
 import { useThemeStore } from '@/store/useThemeStore';
 import { Colors } from '@/constants/Colors';
+
+import { AvatarRenderer } from '../profile/components/AvatarRenderer';
 
 // region CREATE POST
 export function CreatePost() {
@@ -65,7 +68,13 @@ export function CreatePost() {
 
                 {/* Compose area */}
                 <View style={styles.composeRow}>
-                    <Image source={{ uri: avatarUri }} style={[styles.avatar, { borderColor: colors.surface }]} />
+                    {user?.avatarConfig ? (
+                        <View style={{ marginRight: 14, marginTop: 2 }}>
+                            <AvatarRenderer config={user.avatarConfig} size={46} />
+                        </View>
+                    ) : (
+                        <Image source={{ uri: avatarUri }} style={[styles.avatar, { borderColor: colors.surface }]} />
+                    )}
                     <View style={styles.inputWrapper}>
                         <Text style={[styles.authorName, { color: colors.text }]}>
                             {user?.fullName || user?.username || 'You'}
@@ -97,7 +106,7 @@ export function CreatePost() {
 
 // region STYLES-SHEET
 const styles = StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: '#FFFFFF', paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 },
+    safeArea: { flex: 1, backgroundColor: '#FFFFFF' },
     container: { flex: 1 },
     header: {
         flexDirection: 'row',

@@ -13,6 +13,8 @@ model User {
     username String  @unique
     password String
     fcmToken String?
+    avatarConfig Json?
+
 
     posts             Post[]
     comments          Comment[]
@@ -25,8 +27,30 @@ model User {
     sentFriendRequests     FriendRequest[] @relation("SentFriendRequests")
     receivedFriendRequests FriendRequest[] @relation("ReceivedFriendRequests")
 
+    conversations Conversation[] @relation("UserConversations")
+    sentMessages  Message[]      @relation("SentMessages")
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+}
+
+model Conversation {
+    id           String    @id @default(uuid())
+    participants User[]    @relation("UserConversations")
+    messages     Message[]
+    createdAt    DateTime  @default(now())
+    updatedAt    DateTime  @updatedAt
+}
+
+model Message {
+    id             String       @id @default(uuid())
+    content        String       @db.Text
+    senderId       String
+    sender         User         @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+    conversationId String
+    conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+    isRead         Boolean      @default(false)
+    createdAt      DateTime     @default(now())
 }
 
 model Friendship {

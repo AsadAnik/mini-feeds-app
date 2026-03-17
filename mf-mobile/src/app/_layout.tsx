@@ -2,14 +2,18 @@ import React, { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { useAuthStore } from '../store/useAuthStore';
 import { useThemeStore } from '../store/useThemeStore';
+import { useNotifications } from '../hooks/useNotifications';
 import { Colors } from '../constants/Colors';
 import { View, ActivityIndicator, StatusBar } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 // region ROOT-LAYOUT
 export default function RootLayout() {
   const { checkAuth, isHydrating: isAuthHydrating } = useAuthStore();
   const { loadTheme, isHydrated: isThemeHydrated, theme } = useThemeStore();
   const colors = Colors[theme];
+  
+  useNotifications();
 
   useEffect(() => {
     checkAuth();
@@ -26,7 +30,7 @@ export default function RootLayout() {
 
   // region Main UI
   return (
-    <>
+    <SafeAreaProvider>
       <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
         <Stack.Screen name="index" />
@@ -35,6 +39,7 @@ export default function RootLayout() {
         <Stack.Screen name="chat" />
         <Stack.Screen name="friends" />
       </Stack>
-    </>
+    </SafeAreaProvider>
   );
 }
+

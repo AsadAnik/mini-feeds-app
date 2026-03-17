@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useFriendStore } from '@/store/useFriendStore';
 
 export function useFriends(activeTab: 'explore' | 'friends' | 'requests', searchQuery: string) {
@@ -44,6 +44,13 @@ export function useFriends(activeTab: 'explore' | 'friends' | 'requests', search
             ? isLoadingFriends
             : isLoadingRequests;
 
+    const handleRefresh = () => {
+        const query = searchQuery.trim() || undefined;
+        if (activeTab === 'explore') fetchExplore(query);
+        else if (activeTab === 'friends') fetchFriends(query);
+        else if (activeTab === 'requests') fetchRequests();
+    };
+
     return {
         currentList,
         requestsList,
@@ -53,5 +60,6 @@ export function useFriends(activeTab: 'explore' | 'friends' | 'requests', search
         acceptRequest,
         rejectRequest,
         removeFriend,
+        handleRefresh,
     };
 }

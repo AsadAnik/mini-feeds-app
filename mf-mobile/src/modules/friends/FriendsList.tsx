@@ -5,21 +5,25 @@ import {
     StyleSheet,
     FlatList,
     TouchableOpacity,
-    SafeAreaView,
     Platform,
     StatusBar,
     Animated,
     Image,
     TextInput,
-    ActivityIndicator
+    ActivityIndicator,
+    RefreshControl
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { useRouter } from 'expo-router';
 import { ChevronLeft, Search, UserPlus, UserMinus, UserCheck, X } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeStore } from '@/store/useThemeStore';
 import { Colors } from '@/constants/Colors';
-import { useFriendStore, FriendUser, FriendRequest } from '@/store/useFriendStore';
+import { FriendUser, FriendRequest } from '@/store/useFriendStore';
 import { useFriends } from './hooks/useFriends';
+
+import { AvatarRenderer } from '../profile/components/AvatarRenderer';
 
 // region FRIENDS LIST
 export function FriendsList() {
@@ -38,7 +42,8 @@ export function FriendsList() {
         sendRequest,
         acceptRequest,
         rejectRequest,
-        removeFriend
+        removeFriend,
+        handleRefresh
     } = useFriends(activeTab, searchQuery);
 
     const bgColors1 = theme === 'dark'
@@ -64,7 +69,13 @@ export function FriendsList() {
         const isActionLoading = actionLoading === item.id;
         return (
             <View style={[styles.personItem, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.7)' }]}>
-                <Image source={{ uri: item.avatar || `https://ui-avatars.com/api/?name=${item.fullName}` }} style={styles.personAvatar} />
+                {item.avatarConfig ? (
+                    <View style={{ marginRight: 14 }}>
+                        <AvatarRenderer config={item.avatarConfig} size={50} />
+                    </View>
+                ) : (
+                    <Image source={{ uri: item.avatar || `https://ui-avatars.com/api/?name=${item.fullName}` }} style={styles.personAvatar} />
+                )}
                 <View style={styles.personInfo}>
                     <Text style={[styles.personName, { color: colors.text }]} numberOfLines={1}>{item.fullName}</Text>
                     <Text style={[styles.personDesc, { color: colors.textSecondary }]} numberOfLines={1}>@{item.username}</Text>
@@ -99,7 +110,13 @@ export function FriendsList() {
         const isActionLoading = actionLoading === item.id;
         return (
             <View style={[styles.personItem, { backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.7)' }]}>
-                <Image source={{ uri: item.sender.avatar || `https://ui-avatars.com/api/?name=${item.sender.fullName}` }} style={styles.personAvatar} />
+                {(item.sender.avatarConfig && (typeof item.sender.avatarConfig === 'object' || typeof item.sender.avatarConfig === 'string')) ? (
+                    <View style={{ marginRight: 14 }}>
+                        <AvatarRenderer config={item.sender.avatarConfig} size={50} />
+                    </View>
+                ) : (
+                    <Image source={{ uri: item.sender.avatar || `https://ui-avatars.com/api/?name=${item.sender.fullName}` }} style={styles.personAvatar} />
+                )}
                 <View style={styles.personInfo}>
                     <Text style={[styles.personName, { color: colors.text }]} numberOfLines={1}>{item.sender.fullName}</Text>
                     <Text style={[styles.personDesc, { color: colors.textSecondary }]} numberOfLines={1}>@{item.sender.username}</Text>
@@ -125,7 +142,6 @@ export function FriendsList() {
             </View>
         );
     };
-
 
 
     // region Main UI
@@ -226,6 +242,13 @@ export function FriendsList() {
                             showsVerticalScrollIndicator={false}
                             contentContainerStyle={styles.listContent}
                             initialNumToRender={10}
+                            refreshControl={
+                                <RefreshControl
+                                    refreshing={isLoading}
+                                    onRefresh={handleRefresh}
+                                    tintColor={colors.primary}
+                                />
+                            }
                             ListEmptyComponent={
                                 <View style={styles.emptyContainer}>
                                     <Search size={48} color={colors.textSecondary} style={{ opacity: 0.5, marginBottom: 15 }} />
@@ -245,7 +268,7 @@ export function FriendsList() {
 
 // region STYLES-SHEET
 const styles = StyleSheet.create({
-    safeArea: { flex: 1, paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 },
+    safeArea: { flex: 1 },
     container: { flex: 1 },
     header: {
         flexDirection: 'row',

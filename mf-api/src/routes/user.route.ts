@@ -31,6 +31,34 @@ router.get('/profile', AuthMiddleware.verifyUser, userController.getProfile);
 
 /**
  * @swagger
+ * /users/profile:
+ *   put:
+ *     summary: Update current authenticated user profile
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *               avatarConfig:
+ *                 type: object
+ *     responses:
+ *       200:
+ *         description: Profile updated successfully
+ *       401:
+ *         description: Unauthorized
+ */
+// region PUT - /users/profile
+router.put('/profile', AuthMiddleware.verifyUser, userController.updateProfile);
+
+/**
+ * @swagger
  * /users/fcm-token:
  *   post:
  *     summary: Update user's FCM token for notifications
@@ -76,5 +104,38 @@ router.post('/fcm-token', AuthMiddleware.verifyUser, userController.updateFcmTok
  */
 // region GET - /users/notifications
 router.get('/notifications', AuthMiddleware.verifyUser, userController.getNotifications);
+
+/**
+ * @swagger
+ * /users/change-password:
+ *   put:
+ *     summary: Change user password
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - oldPassword
+ *               - newPassword
+ *             properties:
+ *               oldPassword:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password changed successfully
+ *       400:
+ *         description: Invalid input or current password incorrect
+ *       401:
+ *         description: Unauthorized
+ */
+// region PUT - /users/change-password
+router.put('/change-password', AuthMiddleware.verifyUser, userController.changePassword);
 
 export default router;

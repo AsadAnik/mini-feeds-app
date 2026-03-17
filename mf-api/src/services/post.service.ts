@@ -22,7 +22,10 @@ class PostService {
                     author: {
                         select: {
                             id: true,
-                            email: true
+                            email: true,
+                            fullName: true,
+                            username: true,
+                            avatarConfig: true
                         }
                     }
                 }
@@ -58,7 +61,10 @@ class PostService {
                         author: {
                             select: {
                                 id: true,
-                                email: true
+                                email: true,
+                                fullName: true,
+                                username: true,
+                                avatarConfig: true
                             }
                         },
                         _count: {
@@ -189,7 +195,9 @@ class PostService {
                         select: {
                             id: true,
                             fullName: true,
-                            email: true
+                            email: true,
+                            username: true,
+                            avatarConfig: true
                         }
                     }
                 }
@@ -317,7 +325,10 @@ class PostService {
                         author: {
                             select: {
                                 id: true,
-                                email: true
+                                email: true,
+                                fullName: true,
+                                username: true,
+                                avatarConfig: true
                             }
                         }
                     }

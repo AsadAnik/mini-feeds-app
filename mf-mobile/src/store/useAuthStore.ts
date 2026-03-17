@@ -8,6 +8,7 @@ export interface User {
     username: string;
     fullName: string;
     avatarUrl?: string;
+    avatarConfig?: any;
 }
 
 interface AuthState {
@@ -21,9 +22,10 @@ interface AuthState {
     logout: (localOnly?: boolean) => Promise<void>;
     checkAuth: () => Promise<void>;
     completeOnboarding: () => Promise<void>;
+    updateUserData: (data: Partial<User>) => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
     isAuthenticated: false,
     user: null,
     isHydrating: true,
@@ -34,7 +36,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         try {
             const response = await api.post('/auth/login', credentials);
             if (response.data?.success) {
-                const { id, email, fullName, username, accessToken } = response.data.data;
+                const { id, email, fullName, username, avatarConfig, accessToken } = response.data.data;
 
                 await AsyncStorage.setItem('@access_token', accessToken);
 
@@ -43,6 +45,7 @@ export const useAuthStore = create<AuthState>((set) => ({
                     email,
                     fullName,
                     username,
+                    avatarConfig,
                     avatarUrl: `https://i.pravatar.cc/150?u=${id}`
                 };
                 await AsyncStorage.setItem('@user_data', JSON.stringify(userData));
@@ -104,12 +107,27 @@ export const useAuthStore = create<AuthState>((set) => ({
         }
     },
 
+    // region Complete Onboarding
     completeOnboarding: async () => {
         try {
             await AsyncStorage.setItem('@has_seen_onboarding', 'true');
             set({ hasSeenOnboarding: true });
         } catch (e) {
             console.error('Failed to set onboarding status', e);
+        }
+    },
+
+    // region Update User
+    updateUserData: async (data: Partial<User>) => {
+        try {
+            const currentUser = get().user;
+            if (!currentUser) return;
+
+            const updatedUser = { ...currentUser, ...data };
+            await AsyncStorage.setItem('@user_data', JSON.stringify(updatedUser));
+            set({ user: updatedUser });
+        } catch (e) {
+            console.error('Failed to update user data in storage', e);
         }
     }
 }));

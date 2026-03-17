@@ -48,6 +48,7 @@ class FriendService {
                     fullName: true,
                     username: true,
                     email: true,
+                    avatarConfig: true,
                 },
                 take: 50
             });
@@ -78,6 +79,7 @@ class FriendService {
                             fullName: true,
                             username: true,
                             email: true,
+                            avatarConfig: true,
                         }
                     }
                 }
@@ -308,7 +310,8 @@ class FriendService {
                             id: true,
                             fullName: true,
                             username: true,
-                            email: true
+                            email: true,
+                            avatarConfig: true,
                         }
                     }
                 }

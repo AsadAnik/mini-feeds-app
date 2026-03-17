@@ -7,9 +7,13 @@ import routes from './routes';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from '../utils/swagger';
 import http from 'http';
+import { initSocket } from '../lib/socket';
 
 const app = express();
 const server = http.createServer(app);
+
+// Initialize Socket.io
+initSocket(server);
 
 // Swagger Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));

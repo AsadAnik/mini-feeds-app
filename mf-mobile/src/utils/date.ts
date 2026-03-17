@@ -11,3 +11,18 @@ export function timeAgo(date: string | Date): string {
     if (diff < 2592000) return `${Math.floor(diff / 86400)}d ago`;
     return new Date(then).toLocaleDateString();
 }
+
+export function formatChatTime(dateString: string | Date): string {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+
+    if (isNaN(date.getTime())) return '';
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m`;
+    if (diffHours < 24) return `${diffHours}h`;
+    return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+}

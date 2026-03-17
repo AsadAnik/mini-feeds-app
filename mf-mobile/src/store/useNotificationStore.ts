@@ -8,6 +8,7 @@ export interface INotification {
     text: string;
     time: string;
     avatar?: string;
+    avatarConfig?: any;
     postId?: string;
     createdAt: Date;
     isRead: boolean;
@@ -31,7 +32,8 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
             createdAt: new Date(),
             time: 'Just now',
             isRead: false,
-            avatar: notification.avatar || `https://i.pravatar.cc/150?u=${Math.random()}`
+            avatar: notification.avatar || `https://i.pravatar.cc/150?u=${Math.random()}`,
+            avatarConfig: (notification as any).avatarConfig
         };
         return {
             notifications: [newNotification, ...state.notifications]
@@ -50,7 +52,8 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
                 createdAt: new Date(n.createdAt),
                 isRead: n.isRead,
                 postId: n.postId,
-                avatar: `https://i.pravatar.cc/150?u=${n.senderId}`
+                avatar: `https://i.pravatar.cc/150?u=${n.senderId}`,
+                avatarConfig: n.sender?.avatarConfig
             }));
             set({ notifications: mappedNotifications });
         } catch (error) {

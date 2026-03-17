@@ -6,11 +6,12 @@ import {
     FlatList,
     Animated,
     useWindowDimensions,
-    SafeAreaView,
     StatusBar,
     TouchableOpacity,
     Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { useRouter } from 'expo-router';
 import { Globe, MessageSquare, Users, Moon } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -243,7 +244,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'flex-end',
         paddingHorizontal: 24,
-        paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) + 16 : 10,
+        paddingTop: 16,
         height: 60,
     },
     skipText: {

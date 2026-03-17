@@ -8,6 +8,7 @@ export interface FriendUser {
     username: string;
     email: string;
     avatar?: string;
+    avatarConfig?: any;
     mutual?: number;
 }
 
@@ -54,7 +55,11 @@ export const useFriendStore = create<FriendState>((set, get) => ({
         set({ isLoadingExplore: true });
         try {
             const response = await api.get('/friends/explore', { params: { q: query } });
-            set({ exploreList: response.data.data });
+            const exploreList = response.data.data.map((p: any) => ({
+                ...p,
+                avatarConfig: typeof p.avatarConfig === 'string' ? JSON.parse(p.avatarConfig) : p.avatarConfig
+            }));
+            set({ exploreList });
         } catch (error) {
             console.error('Error fetching explore list:', error);
         } finally {
@@ -67,7 +72,11 @@ export const useFriendStore = create<FriendState>((set, get) => ({
         set({ isLoadingFriends: true });
         try {
             const response = await api.get('/friends', { params: { q: query } });
-            set({ friendsList: response.data.data });
+            const friendsList = response.data.data.map((f: any) => ({
+                ...f,
+                avatarConfig: typeof f.avatarConfig === 'string' ? JSON.parse(f.avatarConfig) : f.avatarConfig
+            }));
+            set({ friendsList });
         } catch (error) {
             console.error('Error fetching friends:', error);
         } finally {
@@ -80,7 +89,14 @@ export const useFriendStore = create<FriendState>((set, get) => ({
         set({ isLoadingRequests: true });
         try {
             const response = await api.get('/friends/requests');
-            set({ requestsList: response.data.data });
+            const requestsList = response.data.data.map((r: any) => ({
+                ...r,
+                sender: {
+                    ...r.sender,
+                    avatarConfig: typeof r.sender?.avatarConfig === 'string' ? JSON.parse(r.sender.avatarConfig) : r.sender?.avatarConfig
+                }
+            }));
+            set({ requestsList });
         } catch (error) {
             console.error('Error fetching friend requests:', error);
         } finally {

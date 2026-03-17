@@ -35,6 +35,7 @@ class NotificationService {
         if (Device.isDevice) {
             const { status: existingStatus } = await Notifications.getPermissionsAsync();
             let finalStatus = existingStatus;
+
             if (existingStatus !== 'granted') {
                 const { status } = await Notifications.requestPermissionsAsync();
                 finalStatus = status;
@@ -45,14 +46,10 @@ class NotificationService {
             }
 
             try {
-                const projectId =
-                    Constants?.expoConfig?.extra?.eas?.projectId ??
-                    Constants?.easConfig?.projectId;
-
-                token = (await Notifications.getExpoPushTokenAsync({
-                    projectId,
-                })).data;
+                const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
+                token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
                 console.log('FCM/Expo Token:', token);
+
             } catch (e) {
                 console.error('Error getting push token:', e);
             }
@@ -71,6 +68,7 @@ class NotificationService {
         try {
             await api.post('/users/fcm-token', { fcmToken });
             console.log('FCM token updated on backend');
+
         } catch (error) {
             console.error('Error updating FCM token on backend:', error);
         }
@@ -98,6 +96,7 @@ class NotificationService {
             // Handle navigation or other actions when user taps notification
             const data = response.notification.request.content.data as { postId?: string };
             const postId = data?.postId;
+
             if (postId) {
                 // Potential navigation here if navigation is available
             }
