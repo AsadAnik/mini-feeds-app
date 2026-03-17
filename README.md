@@ -17,7 +17,7 @@ Mini Social Feeds App is a premium, full-featured mobile social networking appli
 
 ### Tech Stack
 - **Frontend (Mobile):** React Native, Expo, Zustand (State Management), React Navigation, Lucide Icons.
-- **Backend (API):** Node.js, Express, Prisma ORM.
+- **Backend (API):** Node.js, Express, PostgreSQL, Prisma ORM.
 
 ---
 
