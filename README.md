@@ -46,7 +46,8 @@ The backend provides a fully documented Swagger API endpoint for seamless integr
 
 🔗 **Link:** [Swagger API Docs](https://mini-feeds-app.onrender.com/api-docs)
 
-![API Documentation](readme_assets/api-doc-swger.png)
+![API Documentation Page 1](readme_assets/sger-1.png)
+![API Documentation Page 2](readme_assets/sger-2.png)
 
 ---
 
