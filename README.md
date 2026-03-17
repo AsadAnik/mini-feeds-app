@@ -30,6 +30,14 @@ Mini Social Feeds App is a premium, full-featured mobile social networking appli
   <img src="readme_assets/feeds-screens.png" alt="Feeds Screens" width="40%" />
 </div>
 
+<div align="center" style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top: 10px;">
+  <img src="readme_assets/av-maker-light.png" alt="Avatar Maker Light" width="40%" />
+  <img src="readme_assets/av-maker-dark.png" alt="Avatar Maker Dark" width="40%" />
+  <img src="readme_assets/chat-list.png" alt="Chat List" width="30%" />
+  <img src="readme_assets/chat-room.png" alt="Chat Room" width="30%" />
+  <img src="readme_assets/friends-ui.png" alt="Friends UI" width="30%" />
+</div>
+
 ---
 
 ## API Documentation
@@ -46,7 +54,7 @@ The backend provides a fully documented Swagger API endpoint for seamless integr
 
 The robust database schema is managed via Prisma ORM, ensuring scalable and reliable data relations between Users, Posts, Comments, and Likes.
 
-![Database Schema](readme_assets/db-ss.png)
+![Database Schema](readme_assets/db-ss-2.png)
 
 ---
 
